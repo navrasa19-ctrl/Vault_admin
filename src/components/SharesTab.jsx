@@ -10,47 +10,54 @@ import {
   Check,
   ShieldAlert,
   Search,
-  Filter,
-  ArrowUpRight,
-  Sparkles
+  ArrowUpRight
 } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
 export default function SharesTab({ shares = [], onRevokeShare }) {
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('ALL'); // ALL, PROTECTED, ACTIVE, EXPIRED
+  const [filterType, setFilterType] = useState('ALL');
   const [copiedId, setCopiedId] = useState(null);
 
-  const filteredShares = shares.filter(share => {
-    const matchesSearch = 
-      (share.documentName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (share.userName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (share.shareId || '').toLowerCase().includes(search.toLowerCase());
+  const shareList = Array.isArray(shares) ? shares : shares?.shares || [];
 
-    const isExpired = new Date(share.expiresAt) < new Date();
+  const filteredShares = shareList.filter(share => {
+    const docName = share.documentTitle || share.documentName || '';
+    const owner = share.ownerName || share.userName || '';
+    const token = share.token || share.shareId || '';
+
+    const matchesSearch = 
+      docName.toLowerCase().includes(search.toLowerCase()) ||
+      owner.toLowerCase().includes(search.toLowerCase()) ||
+      token.toLowerCase().includes(search.toLowerCase());
+
+    const isExpired = share.isExpired || new Date(share.expiresAt) < new Date();
     if (filterType === 'PROTECTED') return matchesSearch && share.isPasswordProtected;
-    if (filterType === 'ACTIVE') return matchesSearch && !isExpired && !share.isRevoked;
+    if (filterType === 'ACTIVE') return matchesSearch && !isExpired && share.status !== 'revoked';
     if (filterType === 'EXPIRED') return matchesSearch && isExpired;
     return matchesSearch;
   });
 
   const handleCopy = (share) => {
-    const url = `https://beememvault.com/share/${share.shareId || share.id}`;
+    const token = share.token || share.id || share.shareId;
+    const url = `https://share.beememvault.com/d/${token}`;
     navigator.clipboard.writeText(url);
-    setCopiedId(share.id || share.shareId);
+    setCopiedId(token);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleExport = () => {
     const data = filteredShares.map(s => ({
-      'Document': s.documentName,
-      'Owner': s.userName,
-      'Share ID': s.shareId,
+      'Document': s.documentTitle || s.documentName,
+      'Owner': s.ownerName || s.userName,
+      'Token': s.token || s.shareId,
+      'Shared With': s.sharedWith || 'Direct Link',
+      'Purpose': s.purpose || 'Verification',
       'Password Protected': s.isPasswordProtected ? 'YES' : 'NO',
-      'Views/Clicks': s.viewCount || 0,
+      'Views': s.viewCount || 0,
       'Created At': s.createdAt,
       'Expires At': s.expiresAt,
-      'Status': s.isRevoked ? 'REVOKED' : new Date(s.expiresAt) < new Date() ? 'EXPIRED' : 'ACTIVE'
+      'Status': s.status
     }));
     exportToCsv('vault_shared_links_audit', data);
   };
@@ -65,7 +72,7 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
             Password-Protected Shared Links & Expiry Tracker
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Real-time telemetry on all public/private shared document links, expiration timers, and instant link revocation.
+            Real MongoDB telemetry on document share tokens, purpose, password protection, and 1-click revocation.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -115,9 +122,10 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
             <thead>
               <tr className="border-b border-slate-800 bg-slate-900/60 text-slate-400 font-semibold uppercase tracking-wider">
                 <th className="py-3.5 px-4">Document / Owner</th>
-                <th className="py-3.5 px-4">Protection Status</th>
+                <th className="py-3.5 px-4">Purpose / Shared With</th>
+                <th className="py-3.5 px-4">Protection</th>
                 <th className="py-3.5 px-4">Expiry Countdown</th>
-                <th className="py-3.5 px-4">Impressions / Views</th>
+                <th className="py-3.5 px-4">Views</th>
                 <th className="py-3.5 px-4">Share URL</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
@@ -125,24 +133,26 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
             <tbody className="divide-y divide-slate-800/60">
               {filteredShares.length > 0 ? (
                 filteredShares.map((s) => {
-                  const sId = s.id || s.shareId;
-                  const isExpired = new Date(s.expiresAt) < new Date();
-                  const remainingMs = new Date(s.expiresAt) - new Date();
-                  const hoursRemaining = Math.max(0, Math.round(remainingMs / (1000 * 60 * 60)));
+                  const sId = s.id || s._id || s.token;
+                  const isExpired = s.isExpired || new Date(s.expiresAt) < new Date();
+                  const isRevoked = s.status === 'revoked';
 
                   return (
                     <tr key={sId} className="hover:bg-slate-800/30 transition">
-                      {/* Doc & Owner */}
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-white text-sm">{s.documentName || 'Confidential Document'}</div>
+                        <div className="font-semibold text-white text-sm">{s.documentTitle || s.documentName || 'Vault Document'}</div>
                         <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                          <span>Owner: {s.userName || 'Subscriber'}</span>
+                          <span>Owner: {s.ownerName || s.userName || 'Subscriber'}</span>
                           <span className="w-1 h-1 rounded-full bg-slate-600"></span>
-                          <span className="font-mono text-slate-500">{s.shareId?.substring(0, 10)}...</span>
+                          <span className="font-mono text-indigo-400">{s.token || s.shareId}</span>
                         </div>
                       </td>
 
-                      {/* Protection Badge */}
+                      <td className="py-3.5 px-4">
+                        <div className="text-slate-300 font-medium">{s.purpose || 'Verification'}</div>
+                        <div className="text-[11px] text-slate-500">{s.sharedWith || 'Public Recipient'}</div>
+                      </td>
+
                       <td className="py-3.5 px-4">
                         {s.isPasswordProtected ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -152,17 +162,16 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             <Unlock className="w-3 h-3" />
-                            Direct Token Link
+                            Token Link
                           </span>
                         )}
                       </td>
 
-                      {/* Expiry */}
                       <td className="py-3.5 px-4">
-                        {s.isRevoked ? (
+                        {isRevoked ? (
                           <span className="inline-flex items-center gap-1 text-rose-400 font-semibold">
                             <ShieldAlert className="w-3.5 h-3.5" />
-                            Revoked by Admin
+                            Revoked
                           </span>
                         ) : isExpired ? (
                           <span className="inline-flex items-center gap-1 text-slate-500 font-medium">
@@ -172,27 +181,24 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
                         ) : (
                           <span className="inline-flex items-center gap-1 text-indigo-300 font-medium">
                             <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                            {hoursRemaining > 24 ? `${Math.round(hoursRemaining / 24)} days left` : `${hoursRemaining} hrs left`}
+                            Active
                           </span>
                         )}
                       </td>
 
-                      {/* Views */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5 text-slate-200 font-semibold">
                           <Eye className="w-3.5 h-3.5 text-slate-400" />
                           <span>{s.viewCount || 0}</span>
-                          <span className="text-[10px] text-slate-500 font-normal">clicks</span>
                         </div>
                       </td>
 
-                      {/* URL Copy */}
                       <td className="py-3.5 px-4">
                         <button
                           onClick={() => handleCopy(s)}
                           className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
                         >
-                          {copiedId === sId ? (
+                          {copiedId === (s.token || sId) ? (
                             <>
                               <Check className="w-3 h-3 text-emerald-400" />
                               <span className="text-[11px] text-emerald-400">Copied!</span>
@@ -206,11 +212,10 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
                         </button>
                       </td>
 
-                      {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
-                        {!s.isRevoked && !isExpired && (
+                        {!isRevoked && (
                           <button
-                            onClick={() => onRevokeShare && onRevokeShare(sId)}
+                            onClick={() => onRevokeShare && onRevokeShare(s.id || s.token)}
                             className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition text-xs font-semibold inline-flex items-center gap-1"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -223,8 +228,8 @@ export default function SharesTab({ shares = [], onRevokeShare }) {
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" className="py-12 text-center text-slate-500 text-sm">
-                    No matching shared document links found.
+                  <td colSpan="7" className="py-12 text-center text-slate-500 text-sm">
+                    No matching shared document links found in database.
                   </td>
                 </tr>
               )}

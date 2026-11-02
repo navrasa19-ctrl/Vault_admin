@@ -2,27 +2,48 @@ import React, { useState } from 'react';
 import {
   FolderPlus,
   Trash2,
-  Edit2,
   Plus,
   X,
   FileText,
   Layers,
-  Sparkles,
-  Shield,
-  Search,
-  CheckCircle2,
-  AlertCircle
+  Search
 } from 'lucide-react';
 
 export default function CategoriesTab({ categories = [], onAddCategory, onDeleteCategory, onAddSubcategory, onDeleteSubcategory }) {
   const [search, setSearch] = useState('');
   const [newSubInput, setNewSubInput] = useState({});
-  const [selectedCat, setSelectedCat] = useState(null);
 
-  const filteredCategories = categories.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.subcategories?.some(s => s.toLowerCase().includes(search.toLowerCase()))
-  );
+  const catList = Array.isArray(categories) ? categories : categories?.categories || [];
+
+  const getCatName = (cat) => {
+    if (!cat) return 'Category';
+    if (typeof cat.name === 'string') return cat.name;
+    return cat.name?.en || cat.name?.hi || cat.id || 'Category';
+  };
+
+  const getCatDesc = (cat) => {
+    if (!cat) return '';
+    if (typeof cat.description === 'string') return cat.description;
+    return cat.homeTileName || 'Vault encrypted classification';
+  };
+
+  const getSubName = (sub) => {
+    if (!sub) return '';
+    if (typeof sub === 'string') return sub;
+    return sub.name?.en || sub.name?.hi || sub.id || 'Subcategory';
+  };
+
+  const getSubId = (sub) => {
+    if (!sub) return '';
+    if (typeof sub === 'string') return sub.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    return sub.id || sub.name?.en || 'sub';
+  };
+
+  const filteredCategories = catList.filter(c => {
+    const name = getCatName(c).toLowerCase();
+    const matchesSearch = name.includes(search.toLowerCase());
+    return matchesSearch;
+  });
 
   const handleAddSub = (catId) => {
     const subName = newSubInput[catId]?.trim();
@@ -43,7 +64,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
             Taxonomy & Category Architecture
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Configure system categories, classifications, and nested subcategories for multi-tenant document vaults.
+            Real MongoDB Category nodes and subcategories. Changes reflect instantly in mobile & web apps.
           </p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -71,6 +92,9 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCategories.map((cat) => {
           const catId = cat.id || cat._id;
+          const catName = getCatName(cat);
+          const subcategories = Array.isArray(cat.subcategories) ? cat.subcategories : [];
+
           return (
             <div
               key={catId}
@@ -82,28 +106,32 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                   <div className="flex items-center gap-3">
                     <div 
                       className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-white shadow-md"
-                      style={{ backgroundColor: (cat.color || '#6366f1') + '25', color: cat.color || '#818cf8', border: `1px solid ${cat.color || '#818cf8'}40` }}
+                      style={{
+                        backgroundColor: (cat.colour || cat.color || '#6366f1') + '25',
+                        color: cat.colour || cat.color || '#818cf8',
+                        border: `1px solid ${cat.colour || cat.color || '#818cf8'}40`
+                      }}
                     >
                       <Layers className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-white text-base tracking-tight flex items-center gap-2">
-                        {cat.name}
-                        {cat.isDefault && (
+                        {catName}
+                        {cat.isHomeTile && (
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            Core
+                            Home Tile
                           </span>
                         )}
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
-                        {cat.description || 'Vault classified storage section'}
+                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1 font-mono">
+                        {cat.id || cat._id}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
                     <button
-                      onClick={() => onDeleteCategory && onDeleteCategory(catId, cat.name)}
+                      onClick={() => onDeleteCategory && onDeleteCategory(cat.id || cat._id, catName)}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
                       title="Delete category"
                     >
@@ -116,31 +144,35 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                 <div className="mt-4 flex items-center gap-2 text-xs text-slate-300 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800/60">
                   <FileText className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Enrolled Documents:</span>
-                  <span className="font-semibold text-white ml-auto">{cat.docCount || 0}</span>
+                  <span className="font-semibold text-white ml-auto">{cat.documentCount || cat.docCount || 0}</span>
                 </div>
 
                 {/* Subcategories list */}
                 <div className="mt-5">
                   <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>Subcategories ({cat.subcategories?.length || 0})</span>
+                    <span>Subcategories ({subcategories.length})</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
-                    {cat.subcategories && cat.subcategories.length > 0 ? (
-                      cat.subcategories.map((sub, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-slate-800/80 text-slate-300 border border-slate-700/60 group/tag hover:border-slate-600"
-                        >
-                          <span>{sub}</span>
-                          <button
-                            onClick={() => onDeleteSubcategory && onDeleteSubcategory(catId, sub)}
-                            className="text-slate-500 hover:text-rose-400 transition"
-                            title="Remove subcategory"
+                    {subcategories.length > 0 ? (
+                      subcategories.map((sub, idx) => {
+                        const sName = getSubName(sub);
+                        const sId = getSubId(sub);
+                        return (
+                          <span
+                            key={sId || idx}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-slate-800/80 text-slate-300 border border-slate-700/60 group/tag hover:border-slate-600"
                           >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))
+                            <span>{sName}</span>
+                            <button
+                              onClick={() => onDeleteSubcategory && onDeleteSubcategory(cat.id || cat._id, sId)}
+                              className="text-slate-500 hover:text-rose-400 transition"
+                              title="Remove subcategory"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        );
+                      })
                     ) : (
                       <span className="text-xs text-slate-500 italic">No subcategories defined</span>
                     )}
@@ -157,12 +189,12 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                     value={newSubInput[catId] || ''}
                     onChange={(e) => setNewSubInput({ ...newSubInput, [catId]: e.target.value })}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddSub(catId);
+                      if (e.key === 'Enter') handleAddSub(cat.id || cat._id);
                     }}
                     className="flex-1 px-3 py-1.5 bg-slate-900/90 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
                   />
                   <button
-                    onClick={() => handleAddSub(catId)}
+                    onClick={() => handleAddSub(cat.id || cat._id)}
                     className="p-2 rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 border border-indigo-500/30 transition text-xs font-medium flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />

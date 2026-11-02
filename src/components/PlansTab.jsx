@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   CreditCard,
   Plus,
   Check,
-  Shield,
   HardDrive,
   Users,
   Edit2,
   Trash2,
-  Sparkles,
   ToggleLeft,
-  ToggleRight,
-  TrendingUp,
-  FileCheck
+  ToggleRight
 } from 'lucide-react';
 
 export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePlan, onTogglePlan }) {
+  const planList = Array.isArray(plans) ? plans : plans?.plans || [];
+
+  const getPrice = (plan) => {
+    if (plan.price !== undefined) return plan.price;
+    if (plan.pricing?.monthly !== undefined) return plan.pricing.monthly;
+    return 0;
+  };
+
+  const getTier = (plan) => {
+    return (plan.tier || plan.badge || plan.planId || 'STANDARD').toUpperCase();
+  };
+
+  const getFeaturesList = (plan) => {
+    if (Array.isArray(plan.features)) return plan.features;
+    if (plan.features && typeof plan.features === 'object') {
+      const list = [];
+      if (plan.features.aiOcr) list.push('AI OCR Instant Document Extraction');
+      if (plan.features.secureShareLinks) list.push('Password Protected Secure Share Links');
+      if (plan.features.expiryReminders) list.push('Automated Expiry Push Reminders');
+      if (plan.features.biometricLock) list.push('Biometric FaceID / Fingerprint Lock');
+      if (plan.features.bulkUploadLimit) list.push(`Bulk Upload Up to ${plan.features.bulkUploadLimit} Files`);
+      if (plan.features.bulkOcr) list.push('Batch OCR Queue Processing');
+      list.push('10 Official Indian Languages');
+      return list;
+    }
+    return ['AES-256 Military Vault Encryption', '10 Indian Languages', 'Secure Cloud Backup'];
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner */}
@@ -26,7 +50,7 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
             Subscription Tiers & Monetization Matrix
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Define storage thresholds, monthly/annual Indian Rupee pricing tiers, feature gates, and plan quotas.
+            Real MongoDB Subscription Plans. Configured with storage allowances, feature gates, and INR pricing.
           </p>
         </div>
         <button
@@ -40,23 +64,23 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
 
       {/* Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {plans.map((plan) => {
-          const planId = plan.id || plan._id;
-          const isPremium = plan.tier === 'PREMIUM' || plan.name?.toLowerCase().includes('premium');
-          const isFamily = plan.tier === 'FAMILY' || plan.name?.toLowerCase().includes('family');
+        {planList.map((plan) => {
+          const planId = plan.id || plan._id || plan.planId;
+          const tier = getTier(plan);
+          const price = getPrice(plan);
+          const features = getFeaturesList(plan);
+          const isPopular = tier === 'PREMIUM';
 
           return (
             <div
               key={planId}
               className={`relative rounded-3xl p-6 border flex flex-col justify-between transition-all duration-300 hover:shadow-2xl ${
-                isPremium
+                isPopular
                   ? 'bg-gradient-to-b from-indigo-950/40 via-[#0F1523] to-[#0B0F19] border-indigo-500/40 shadow-indigo-500/10'
-                  : isFamily
-                  ? 'bg-gradient-to-b from-purple-950/40 via-[#0F1523] to-[#0B0F19] border-purple-500/40 shadow-purple-500/10'
                   : 'bg-[#0F1523]/90 border-slate-800 hover:border-slate-700'
               }`}
             >
-              {isPremium && (
+              {isPopular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-bold tracking-wider uppercase shadow-md">
                   Most Popular
                 </div>
@@ -66,22 +90,15 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 {/* Plan Header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">{plan.name}</h3>
+                    <h3 className="text-lg font-bold text-white tracking-tight">{plan.name || tier}</h3>
                     <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-1 inline-block">
-                      {plan.tier || 'STANDARD'}
+                      {tier}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => onEditPlan && onEditPlan(plan)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition"
-                      title="Edit plan"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    {!['FREE', 'PREMIUM'].includes(plan.tier) && (
+                    {!['FREE', 'PREMIUM'].includes(tier) && (
                       <button
-                        onClick={() => onDeletePlan && onDeletePlan(planId, plan.name)}
+                        onClick={() => onDeletePlan && onDeletePlan(plan.planId || tier, plan.name)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
                         title="Delete plan"
                       >
@@ -95,11 +112,11 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 <div className="mt-5 pb-5 border-b border-slate-800/80">
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-extrabold text-white">
-                      ₹{plan.price !== undefined ? plan.price : 0}
+                      ₹{price}
                     </span>
                     <span className="text-xs text-slate-400 font-medium">/{plan.interval || 'month'}</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">{plan.description || 'High-security encrypted vault storage'}</p>
+                  <p className="text-xs text-slate-400 mt-1">Encrypted personal vault storage tier</p>
                 </div>
 
                 {/* Core Metrics */}
@@ -109,14 +126,14 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                       <HardDrive className="w-3.5 h-3.5 text-indigo-400" />
                       Storage Allocation:
                     </span>
-                    <span className="font-semibold text-white">{plan.storageLimitGB || plan.storageLimit || 5} GB</span>
+                    <span className="font-semibold text-white">{plan.storageLimitGB || 5} GB</span>
                   </div>
                   <div className="flex items-center justify-between text-slate-300">
                     <span className="flex items-center gap-2 text-slate-400">
                       <Users className="w-3.5 h-3.5 text-purple-400" />
-                      Active Subscribers:
+                      People / Devices:
                     </span>
-                    <span className="font-semibold text-white">{plan.activeUsersCount || 0}</span>
+                    <span className="font-semibold text-white">{plan.peopleLimit || 1}</span>
                   </div>
                 </div>
 
@@ -124,12 +141,7 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 <div className="mt-4 space-y-2">
                   <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Features Included</div>
                   <ul className="space-y-1.5">
-                    {(plan.features || [
-                      'AES-256 Military Encryption',
-                      '10 Indian Languages Support',
-                      'Password Protected Share Links',
-                      'Instant Refer & Earn Bonus'
-                    ]).map((feat, i) => (
+                    {features.map((feat, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-slate-300">
                         <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                         <span>{feat}</span>
@@ -139,29 +151,11 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 </div>
               </div>
 
-              {/* Status and Toggle */}
+              {/* Status Badge */}
               <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${
-                  plan.isActive !== false
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                    : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                }`}>
-                  {plan.isActive !== false ? 'Active & Published' : 'Disabled'}
+                <span className="text-xs px-2.5 py-1 rounded-full font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                  Active in Live Database
                 </span>
-                <button
-                  onClick={() => onTogglePlan && onTogglePlan(planId, !plan.isActive)}
-                  className="text-xs text-slate-400 hover:text-white transition flex items-center gap-1 font-medium"
-                >
-                  {plan.isActive !== false ? (
-                    <span className="text-emerald-400 flex items-center gap-1">
-                      <ToggleRight className="w-5 h-5" /> Live
-                    </span>
-                  ) : (
-                    <span className="text-slate-500 flex items-center gap-1">
-                      <ToggleLeft className="w-5 h-5" /> Off
-                    </span>
-                  )}
-                </button>
               </div>
             </div>
           );

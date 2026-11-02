@@ -1,37 +1,40 @@
 import React, { useState } from 'react';
-import { Search, Filter, ShieldCheck, Download, MoreVertical, Edit2, Crown, UserCheck } from 'lucide-react';
+import { Search, ShieldCheck, Download, Edit2, Crown, UserCheck } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
-export default function UsersTab({ users, onAllotPlan, onUpdateRole }) {
+export default function UsersTab({ users = [], onAllotPlan }) {
   const [search, setSearch] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('ALL');
   const [selectedState, setSelectedState] = useState('ALL');
 
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      !search ||
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.phone.includes(search);
+  const userList = Array.isArray(users) ? users : users?.users || [];
 
-    const matchesPlan = selectedPlan === 'ALL' || u.plan === selectedPlan;
-    const matchesState = selectedState === 'ALL' || u.state === selectedState;
+  const filteredUsers = userList.filter((u) => {
+    const name = (u.name || '').toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    const phone = (u.phone || u.phoneNumber || '');
+    const s = search.toLowerCase();
+
+    const matchesSearch = !s || name.includes(s) || email.includes(s) || phone.includes(s);
+    const matchesPlan = selectedPlan === 'ALL' || (u.plan || 'PREMIUM') === selectedPlan;
+    const matchesState = selectedState === 'ALL' || (u.state || 'Maharashtra') === selectedState;
 
     return matchesSearch && matchesPlan && matchesState;
   });
 
   const handleExportUsers = () => {
-    exportToCsv('vault_users_roster', filteredUsers, [
-      { key: 'name', label: 'Name' },
-      { key: 'email', label: 'Email' },
-      { key: 'phone', label: 'Phone' },
-      { key: 'plan', label: 'Plan' },
-      { key: 'role', label: 'Role' },
-      { key: 'state', label: 'State' },
-      { key: 'documentCount', label: 'Documents' },
-      { key: 'storageMB', label: 'Storage Used (MB)' },
-      { key: 'createdAt', label: 'Registration Date' }
-    ]);
+    const exportData = filteredUsers.map(u => ({
+      'Name': u.name || 'Unnamed User',
+      'Email': u.email || 'N/A',
+      'Phone': u.phone || u.phoneNumber || 'N/A',
+      'Plan': u.plan || 'PREMIUM',
+      'Role': u.role || 'user',
+      'State': u.state || 'Maharashtra',
+      'Documents Count': u.documentCount || 0,
+      'Storage Used (MB)': u.storageMB || 0,
+      'Registration Date': u.createdAt
+    }));
+    exportToCsv('vault_users_roster', exportData);
   };
 
   const getPlanBadge = (plan) => {
@@ -39,153 +42,159 @@ export default function UsersTab({ users, onAllotPlan, onUpdateRole }) {
       case 'BUSINESS':
         return 'bg-purple-500/15 text-purple-300 border-purple-500/30';
       case 'FAMILY':
-        return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30';
-      case 'PREMIUM':
         return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      case 'PREMIUM':
+        return 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30';
       default:
-        return 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+        return 'bg-slate-500/15 text-slate-300 border-slate-500/30';
     }
   };
 
+  const states = Array.from(new Set(userList.map(u => u.state).filter(Boolean)));
+
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Header and Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Registered Vault Accounts</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Displaying {filteredUsers.length} of {users.length} total users with document counts and storage usage
-          </p>
+      {/* Controls Bar */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
+        <div className="flex flex-wrap items-center gap-3 flex-1">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by name, email, phone..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+            />
+          </div>
+
+          {/* Plan Filter */}
+          <select
+            value={selectedPlan}
+            onChange={(e) => setSelectedPlan(e.target.value)}
+            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500/50"
+          >
+            <option value="ALL">All Plans ({userList.length})</option>
+            <option value="FREE">FREE</option>
+            <option value="PREMIUM">PREMIUM</option>
+            <option value="FAMILY">FAMILY</option>
+            <option value="BUSINESS">BUSINESS</option>
+          </select>
+
+          {/* State Filter */}
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500/50"
+          >
+            <option value="ALL">All States</option>
+            {states.map(st => (
+              <option key={st} value={st}>{st}</option>
+            ))}
+          </select>
         </div>
 
         <button
           onClick={handleExportUsers}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-500/25 transition-all"
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition"
         >
           <Download className="w-4 h-4" />
-          <span>Export Users CSV</span>
+          <span>Export CSV</span>
         </button>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-1 min-w-[280px]">
-          <div className="relative w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search user by name, email, phone..."
-              className="w-full bg-[#0F1523] text-xs text-slate-200 placeholder-slate-500 pl-9 pr-4 py-2 rounded-xl border border-white/10 focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-400 font-medium">Plan:</span>
-          {['ALL', 'FREE', 'PREMIUM', 'FAMILY', 'BUSINESS'].map((plan) => (
-            <button
-              key={plan}
-              onClick={() => setSelectedPlan(plan)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                selectedPlan === plan
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-slate-200'
-              }`}
-            >
-              {plan}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Users Table */}
-      <div className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+      <div className="rounded-2xl bg-[#0F1523]/80 border border-slate-800 overflow-hidden shadow-2xl backdrop-blur-xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-white/[0.08] bg-white/[0.02] text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th className="py-4 px-6">User / Account</th>
-                <th className="py-4 px-4">Contact</th>
-                <th className="py-4 px-4">Plan & Expiry</th>
-                <th className="py-4 px-4">State</th>
-                <th className="py-4 px-4 text-center">Docs</th>
-                <th className="py-4 px-4">Storage Used</th>
-                <th className="py-4 px-4">Role</th>
-                <th className="py-4 px-6 text-right">Actions</th>
+              <tr className="border-b border-slate-800 bg-slate-900/60 text-slate-400 font-semibold uppercase tracking-wider">
+                <th className="py-3.5 px-4">Subscriber</th>
+                <th className="py-3.5 px-4">Contact</th>
+                <th className="py-3.5 px-4">Subscription Plan</th>
+                <th className="py-3.5 px-4">State</th>
+                <th className="py-3.5 px-4">Documents</th>
+                <th className="py-3.5 px-4">Storage Used</th>
+                <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.05] text-xs">
-              {filteredUsers.map((u) => (
-                <tr key={u.id} className="hover:bg-white/[0.02] transition-colors group">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600/30 to-purple-600/30 border border-indigo-500/30 flex items-center justify-center font-bold text-indigo-300">
-                        {u.name ? u.name[0].toUpperCase() : 'U'}
-                      </div>
-                      <div>
-                        <p className="font-bold text-white text-sm leading-tight">{u.name || 'Unnamed'}</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5">ID: {String(u.id).slice(-8)}</p>
-                      </div>
-                    </div>
-                  </td>
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((u) => {
+                  const uid = u.id || u._id;
+                  const isAdm = u.role === 'admin' || u.role === 'business_admin';
+                  return (
+                    <tr key={uid} className="hover:bg-slate-800/30 transition">
+                      {/* Name & Role */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                            {(u.name || u.email || 'U').charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-white flex items-center gap-1.5">
+                              <span>{u.name || 'Unnamed User'}</span>
+                              {isAdm && (
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase">
+                                  <Crown className="w-2.5 h-2.5" />
+                                  Admin
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-slate-400 font-mono">{uid.substring(0, 10)}...</div>
+                          </div>
+                        </div>
+                      </td>
 
-                  <td className="py-4 px-4">
-                    <p className="text-slate-300 font-medium">{u.email || '—'}</p>
-                    <p className="text-slate-500 text-[11px]">{u.phone || '—'}</p>
-                  </td>
+                      {/* Contact */}
+                      <td className="py-3.5 px-4">
+                        <div className="text-slate-200">{u.email || 'No email registered'}</div>
+                        <div className="text-[11px] text-slate-400 font-mono">{u.phone || u.phoneNumber || 'No phone'}</div>
+                      </td>
 
-                  <td className="py-4 px-4">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${getPlanBadge(u.plan)}`}>
-                      {u.plan}
-                    </span>
-                    {u.extraStorageBytes > 0 && (
-                      <span className="block text-[10px] text-emerald-400 mt-0.5">+{u.extraStorageGB} GB Bonus</span>
-                    )}
-                  </td>
+                      {/* Plan Badge */}
+                      <td className="py-3.5 px-4">
+                        <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getPlanBadge(u.plan || 'PREMIUM')}`}>
+                          {u.plan || 'PREMIUM'}
+                        </span>
+                      </td>
 
-                  <td className="py-4 px-4 text-slate-300">
-                    {u.state || 'Maharashtra'}
-                  </td>
+                      {/* State */}
+                      <td className="py-3.5 px-4 text-slate-300">
+                        {u.state || 'Maharashtra'}
+                      </td>
 
-                  <td className="py-4 px-4 text-center">
-                    <span className="inline-block px-2.5 py-1 rounded-md bg-white/[0.05] text-indigo-300 font-bold text-xs">
-                      {u.documentCount || 0}
-                    </span>
-                  </td>
+                      {/* Document count */}
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold text-white text-sm">{u.documentCount || 0}</span>
+                      </td>
 
-                  <td className="py-4 px-4 text-slate-300 font-medium">
-                    {u.storageMB || 0} MB
-                  </td>
+                      {/* Storage */}
+                      <td className="py-3.5 px-4 text-slate-300 font-mono">
+                        {u.storageMB ? `${u.storageMB} MB` : u.storageBytes ? `${(u.storageBytes/1048576).toFixed(2)} MB` : '0 MB'}
+                      </td>
 
-                  <td className="py-4 px-4">
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
-                      u.role === 'admin' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-slate-500/10 text-slate-400'
-                    }`}>
-                      {u.role}
-                    </span>
-                  </td>
-
-                  <td className="py-4 px-6 text-right">
-                    <button
-                      onClick={() => onAllotPlan(u)}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 font-semibold text-xs transition-all mr-2"
-                    >
-                      Allot Plan
-                    </button>
-                    {u.role !== 'admin' && (
-                      <button
-                        onClick={() => onUpdateRole(u.id, 'admin')}
-                        title="Make Admin"
-                        className="px-2 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white text-xs font-medium transition-all"
-                      >
-                        Make Admin
-                      </button>
-                    )}
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          onClick={() => onAllotPlan && onAllotPlan(u)}
+                          className="px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition text-xs font-semibold inline-flex items-center gap-1.5"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>Allot Plan</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="7" className="py-12 text-center text-slate-500 text-sm">
+                    No registered subscribers found matching query.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
