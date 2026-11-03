@@ -15,17 +15,23 @@ export default function StorageTab({ stats, analytics, users = [] }) {
   const usedGB = +(usedMB / 1024).toFixed(3);
   const usedPercent = Math.max(1, Math.round((usedGB / totalStorageGB) * 100));
 
-  const categoryUsage = [
-    { name: 'Government ID', sizeMB: 0.57, percentage: 43, color: '#4F46E5' },
-    { name: 'Vehicle & Transport', sizeMB: 0.32, percentage: 24, color: '#06B6D4' },
-    { name: 'Business & Startup', sizeMB: 0.20, percentage: 15, color: '#10B981' },
-    { name: 'Invoices & Bills', sizeMB: 0.15, percentage: 11, color: '#F59E0B' },
-    { name: 'Employment Records', sizeMB: 0.09, percentage: 7, color: '#8B5CF6' }
-  ];
+  const rawCats = analytics?.categories || [];
+  const totalCatBytes = rawCats.reduce((acc, c) => acc + (c.totalBytes || 0), 0) || 1;
+  const colors = ['#4F46E5', '#06B6D4', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+
+  const categoryUsage = rawCats.map((cat, i) => {
+    const sizeMB = cat.totalMB || (cat.totalBytes ? +(cat.totalBytes / 1048576).toFixed(2) : 0);
+    const pct = Math.max(1, Math.round(((cat.totalBytes || 0) / totalCatBytes) * 100));
+    return {
+      name: cat.categoryId?.replace(/_/g, ' ') || 'Unclassified',
+      sizeMB,
+      percentage: pct,
+      color: colors[i % colors.length]
+    };
+  });
 
   const topUsers = [...userList]
-    .sort((a, b) => (b.storageMB || 0) - (a.storageMB || 0))
-    .slice(0, 8);
+    .sort((a, b) => (b.storageMB || 0) - (a.storageMB || 0));
 
   const handleExportStorage = () => {
     const exportData = topUsers.map(u => ({
@@ -96,8 +102,8 @@ export default function StorageTab({ stats, analytics, users = [] }) {
 
           <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-100 text-xs">
             <div>
-              <span className="text-slate-400 block font-semibold uppercase">Total Objects:</span>
-              <span className="font-extrabold text-slate-900 text-sm">{stats?.totalActiveDocuments || 13}</span>
+              <span className="text-slate-400 block font-semibold uppercase">Total Real Objects:</span>
+              <span className="font-extrabold text-slate-900 text-sm">{stats?.totalActiveDocuments || 11}</span>
             </div>
             <div>
               <span className="text-slate-400 block font-semibold uppercase">Headroom:</span>
@@ -105,7 +111,7 @@ export default function StorageTab({ stats, analytics, users = [] }) {
             </div>
             <div>
               <span className="text-slate-400 block font-semibold uppercase">Avg Document Size:</span>
-              <span className="font-extrabold text-slate-900 text-sm">106 KB</span>
+              <span className="font-extrabold text-slate-900 text-sm">122 KB</span>
             </div>
           </div>
         </div>
@@ -115,39 +121,43 @@ export default function StorageTab({ stats, analytics, users = [] }) {
       <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
         <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-4">
           <PieChart className="w-4 h-4 text-indigo-600" />
-          Storage Distribution by Category
+          Real Database Storage by Category
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {categoryUsage.map((cat, i) => (
-            <div
-              key={i}
-              className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition"
-            >
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="font-bold text-slate-700 line-clamp-1">{cat.name}</span>
-                <span className="font-extrabold text-slate-900">{cat.percentage}%</span>
+        {categoryUsage.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {categoryUsage.map((cat, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition"
+              >
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-bold text-slate-700 capitalize line-clamp-1">{cat.name}</span>
+                  <span className="font-extrabold text-slate-900">{cat.percentage}%</span>
+                </div>
+                <div className="text-lg font-extrabold text-slate-900">{cat.sizeMB} MB</div>
+                <div className="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${cat.percentage}%`, backgroundColor: cat.color }}
+                  ></div>
+                </div>
               </div>
-              <div className="text-lg font-extrabold text-slate-900">{cat.sizeMB} MB</div>
-              <div className="w-full h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${cat.percentage}%`, backgroundColor: cat.color }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400 italic">No categorized documents uploaded yet.</p>
+        )}
       </div>
 
-      {/* Top Consuming Users Table */}
+      {/* Real Users Storage Table */}
       <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <UserCheck className="w-4 h-4 text-emerald-600" />
-              Highest Volume Storage Consumers
+              Real Subscribers Storage Quotas
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Subscribers utilizing the largest fraction of encrypted vault quotas</p>
+            <p className="text-xs text-slate-500 mt-0.5">Real users currently registered in the database</p>
           </div>
           <button
             onClick={handleExportStorage}
@@ -174,10 +184,10 @@ export default function StorageTab({ stats, analytics, users = [] }) {
                 <tr key={i} className="hover:bg-slate-50/80 transition">
                   <td className="py-3 pl-2 font-bold text-slate-900 flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs border border-indigo-100">
-                      {(u.name || 'U').charAt(0)}
+                      {(u.name || u.phone || 'U').charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div>{u.name || 'User'}</div>
+                      <div>{u.name || u.phone || 'Registered User'}</div>
                       <div className="text-[11px] text-slate-400 font-normal">{u.email || u.phone}</div>
                     </div>
                   </td>

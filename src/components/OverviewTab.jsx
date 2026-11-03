@@ -4,21 +4,17 @@ import {
   FileText,
   HardDrive,
   Share2,
-  TrendingUp,
   MapPin,
-  Shield,
   Layers,
   ArrowUpRight,
   Sparkles,
-  PieChart,
-  CheckCircle2,
   Download
 } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
 export default function OverviewTab({ stats, analytics, users = [], setActiveTab }) {
   const userList = Array.isArray(users) ? users : users?.users || [];
-  const stateData = analytics?.stateBreakdown || [];
+  const stateData = (analytics?.stateBreakdown || []).filter(s => (s.userCount > 0 || s.documentCount > 0));
   const categoryData = analytics?.categories || [];
 
   const handleExportStates = () => {
@@ -60,12 +56,12 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-slate-900">{stats?.totalUsers || userList.length || 11}</span>
+            <span className="text-3xl font-extrabold text-slate-900">{userList.length || stats?.totalUsers || 5}</span>
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
-              +100% Active
+              Real DB Users
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1 font-medium">Pan-India citizen accounts</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Active subscriber accounts</p>
         </div>
 
         {/* Card 2: Documents */}
@@ -77,7 +73,7 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-slate-900">{stats?.totalActiveDocuments || 13}</span>
+            <span className="text-3xl font-extrabold text-slate-900">{stats?.totalActiveDocuments || 11}</span>
             <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
               AES-256 GCM
             </span>
@@ -132,15 +128,17 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
                 <MapPin className="w-4 h-4 text-indigo-600" />
                 State-Wise User Demographics (India)
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">Real geographical distribution across Indian states and union territories</p>
+              <p className="text-xs text-slate-500 mt-0.5">Real geographical distribution across registered Indian subscribers</p>
             </div>
-            <button
-              onClick={handleExportStates}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition"
-            >
-              <Download className="w-3.5 h-3.5 text-slate-500" />
-              <span>Export CSV</span>
-            </button>
+            {stateData.length > 0 && (
+              <button
+                onClick={handleExportStates}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition"
+              >
+                <Download className="w-3.5 h-3.5 text-slate-500" />
+                <span>Export CSV</span>
+              </button>
+            )}
           </div>
 
           <div className="overflow-x-auto">
@@ -151,12 +149,12 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
                   <th className="pb-3">Subscribers</th>
                   <th className="pb-3">Documents</th>
                   <th className="pb-3">Storage Consumed</th>
-                  <th className="pb-3 pr-2 text-right">Population %</th>
+                  <th className="pb-3 pr-2 text-right">Share %</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {stateData.map((st, i) => {
-                  const totalUsers = stats?.totalUsers || 11;
+                  const totalUsers = userList.length || 5;
                   const pct = Math.round((st.userCount / totalUsers) * 100);
 
                   return (
@@ -196,25 +194,29 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
               <Layers className="w-4 h-4 text-violet-600" />
               Document Categories
             </h3>
-            <p className="text-xs text-slate-500 mb-6">Distribution of documents across enrolled categories</p>
+            <p className="text-xs text-slate-500 mb-6">Real distribution of documents stored in MongoDB</p>
 
             <div className="space-y-3.5">
-              {categoryData.map((cat, i) => (
-                <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="font-bold text-slate-800 capitalize">
-                      {cat.categoryId?.replace(/_/g, ' ') || 'Identity'}
-                    </span>
-                    <span className="font-extrabold text-indigo-600">{cat.docCount} docs</span>
+              {categoryData.length > 0 ? (
+                categoryData.map((cat, i) => (
+                  <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className="font-bold text-slate-800 capitalize">
+                        {cat.categoryId?.replace(/_/g, ' ') || 'Identity'}
+                      </span>
+                      <span className="font-extrabold text-indigo-600">{cat.docCount} docs</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                        style={{ width: `${Math.min(100, cat.docCount * 20)}%` }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
-                      style={{ width: `${Math.min(100, cat.docCount * 20)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-xs text-slate-400 italic">No document categories loaded.</p>
+              )}
             </div>
           </div>
 

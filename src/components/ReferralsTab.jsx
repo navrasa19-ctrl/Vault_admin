@@ -15,10 +15,10 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
   const [filterStatus, setFilterStatus] = useState('ALL');
 
   const metrics = referrals?.metrics || {
-    totalReferrals: 1,
-    convertedReferrals: 1,
-    conversionRate: 100,
-    totalStorageBonusGB: 1
+    totalReferrals: 0,
+    convertedReferrals: 0,
+    conversionRate: 0,
+    totalStorageBonusGB: 0
   };
 
   const activityList = Array.isArray(referrals)
@@ -27,7 +27,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
     ? referrals.recentReferrals
     : [];
 
-  const topReferrers = Array.isArray(referrals?.topReferrers) && referrals.topReferrers.length > 0
+  const topReferrers = (Array.isArray(referrals?.topReferrers) && referrals.topReferrers.length > 0)
     ? referrals.topReferrers
     : users.filter(u => u.referralCount > 0);
 
@@ -61,13 +61,15 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
             Real MongoDB referral ledger, organic conversion funnel, bonus quotas, and promoter champions.
           </p>
         </div>
-        <button
-          onClick={handleExport}
-          className="px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition flex items-center gap-2"
-        >
-          <span>Export CSV</span>
-          <ArrowUpRight className="w-3.5 h-3.5" />
-        </button>
+        {filteredReferrals.length > 0 && (
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition flex items-center gap-2"
+          >
+            <span>Export CSV</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* 4 Metric Cards */}
@@ -78,7 +80,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
             <Users className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-3xl font-extrabold text-slate-900">{metrics.totalReferrals || 0}</div>
-          <div className="text-xs text-indigo-600 mt-1 font-semibold">From organic signups</div>
+          <div className="text-xs text-slate-400 mt-1 font-medium">From organic signups</div>
         </div>
 
         <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
@@ -95,7 +97,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
             <span>Conversion Velocity</span>
             <TrendingUp className="w-4 h-4 text-violet-600" />
           </div>
-          <div className="text-3xl font-extrabold text-violet-600">{metrics.conversionRate || 100}%</div>
+          <div className="text-3xl font-extrabold text-violet-600">{metrics.conversionRate || 0}%</div>
           <div className="text-xs text-slate-500 mt-1 font-medium">Invite-to-activation ratio</div>
         </div>
 
@@ -132,26 +134,26 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
                       #{idx + 1}
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900 text-sm">{item.name || item.email}</div>
-                      <div className="text-[11px] font-mono text-indigo-600">{item.email}</div>
+                      <div className="font-bold text-slate-900 text-sm">{item.name || item.phone || item.email}</div>
+                      <div className="text-[11px] font-mono text-indigo-600">{item.email || item.phone}</div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <div className="font-extrabold text-slate-900 text-sm">{item.referralCount || 1}</div>
+                      <div className="font-extrabold text-slate-900 text-sm">{item.referralCount || 0}</div>
                       <div className="text-[10px] text-slate-400 uppercase font-bold">Invites</div>
                     </div>
                     <div>
-                      <div className="font-extrabold text-emerald-600 text-sm">+{item.referralCredits || 1} GB</div>
+                      <div className="font-extrabold text-emerald-600 text-sm">+{item.referralCredits || 0} GB</div>
                       <div className="text-[10px] text-slate-400 uppercase font-bold">Bonus Earned</div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="p-6 rounded-2xl bg-slate-50 text-center text-slate-500 text-xs">
-                Aarav Sharma (Code: <span className="text-indigo-600 font-mono font-bold">AARAV100</span>) - 1 Qualified Invite (+1 GB Awarded)
+              <div className="p-8 rounded-2xl bg-slate-50 border border-slate-100 text-center text-slate-400 text-xs">
+                No active community referrals logged in the database yet. When users share invite codes from the app, top promoters will appear here.
               </div>
             )}
           </div>
