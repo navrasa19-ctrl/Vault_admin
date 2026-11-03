@@ -12,7 +12,8 @@ import {
   Sparkles,
   ShieldCheck,
   TrendingUp,
-  Filter
+  Filter,
+  MapPin
 } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
@@ -79,9 +80,10 @@ export default function UsersTab({ users = [], onAllotPlan }) {
     const name = (u.name || '').toLowerCase();
     const email = (u.email || '').toLowerCase();
     const phone = (u.phone || u.phoneNumber || '');
+    const state = (u.state || 'Maharashtra').toLowerCase();
     const s = search.toLowerCase();
 
-    const matchesSearch = !s || name.includes(s) || email.includes(s) || phone.includes(s);
+    const matchesSearch = !s || name.includes(s) || email.includes(s) || phone.includes(s) || state.includes(s);
     const matchesPlan = selectedPlan === 'ALL' || (u.plan || 'PREMIUM') === selectedPlan;
 
     const lifecycle = getUserLifecycle(u);
@@ -99,6 +101,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
       const l = getUserLifecycle(u);
       return {
         'Name': u.name || 'Unnamed User',
+        'State': u.state || 'Maharashtra',
         'Email': u.email || 'N/A',
         'Phone': u.phone || u.phoneNumber || 'N/A',
         'Plan': u.plan || 'PREMIUM',
@@ -331,6 +334,10 @@ export default function UsersTab({ users = [], onAllotPlan }) {
                             </div>
                             <div className="text-[11px] text-slate-400 font-mono">
                               {u.email || u.phone || uid.substring(0, 10)}
+                            </div>
+                            <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5 font-medium">
+                              <MapPin className="w-2.5 h-2.5 text-indigo-500 shrink-0" />
+                              <span>{u.state || 'Maharashtra'}</span>
                             </div>
                           </div>
                         </div>
