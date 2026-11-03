@@ -153,11 +153,9 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="pb-3 pl-2">State</th>
-                  <th className="pb-3">Subscribers</th>
-                  <th className="pb-3">Documents</th>
-                  <th className="pb-3">Storage Consumed</th>
-                  <th className="pb-3 pr-2 text-right">Share %</th>
+                  <th className="pb-3 pl-2">State / Region</th>
+                  <th className="pb-3">Registered Subscribers</th>
+                  <th className="pb-3 pr-2 text-right">User Distribution %</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -166,25 +164,21 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
                   const pct = Math.round((st.userCount / totalUsers) * 100);
 
                   return (
-                    <tr key={i} className="hover:bg-slate-50/80 transition">
+                    <tr key={i} className="hover:bg-slate-50/80 transition cursor-pointer" onClick={() => setActiveTab && setActiveTab('geo')}>
                       <td className="py-3 pl-2 font-semibold text-slate-900 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
                         <span>{st.state}</span>
                       </td>
-                      <td className="py-3 font-medium text-slate-700">{st.userCount}</td>
-                      <td className="py-3 font-medium text-slate-700">{st.documentCount || 0}</td>
-                      <td className="py-3 font-mono text-slate-600">
-                        {st.storageMB ? `${st.storageMB} MB` : '0 MB'}
-                      </td>
+                      <td className="py-3 font-bold text-slate-800">{st.userCount} {st.userCount === 1 ? 'User' : 'Users'}</td>
                       <td className="py-3 pr-2 text-right">
                         <div className="inline-flex items-center gap-2">
-                          <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
                               style={{ width: `${Math.max(5, pct)}%` }}
                             ></div>
                           </div>
-                          <span className="font-mono font-bold text-slate-700 text-[11px] w-8">{pct}%</span>
+                          <span className="text-slate-500 font-mono font-bold text-[11px] w-9 text-right">{pct}%</span>
                         </div>
                       </td>
                     </tr>
