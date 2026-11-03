@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
-import OverviewTab from './components/OverviewTab';
-import UsersTab from './components/UsersTab';
-import StateDemographicsTab from './components/StateDemographicsTab';
-import CategoriesTab from './components/CategoriesTab';
-import PlansTab from './components/PlansTab';
-import StorageTab from './components/StorageTab';
-import SharesTab from './components/SharesTab';
-import ReferralsTab from './components/ReferralsTab';
-import LanguagesTab from './components/LanguagesTab';
-import AdminsTab from './components/AdminsTab';
-import AccessRestrictedTab from './components/AccessRestrictedTab';
-import PlanAllotmentModal from './components/PlanAllotmentModal';
-import AddCategoryModal from './components/AddCategoryModal';
-import AddPlanModal from './components/AddPlanModal';
-import LoginModal from './components/LoginModal';
-import { api, DEFAULT_ADMIN_USER } from './services/api';
+import React, { useState, useEffect } from "react";
+import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+import OverviewTab from "./components/OverviewTab";
+import UsersTab from "./components/UsersTab";
+import StateDemographicsTab from "./components/StateDemographicsTab";
+import CategoriesTab from "./components/CategoriesTab";
+import PlansTab from "./components/PlansTab";
+import StorageTab from "./components/StorageTab";
+import SharesTab from "./components/SharesTab";
+import ReferralsTab from "./components/ReferralsTab";
+import LanguagesTab from "./components/LanguagesTab";
+import AdminsTab from "./components/AdminsTab";
+import AccessRestrictedTab from "./components/AccessRestrictedTab";
+import PlanAllotmentModal from "./components/PlanAllotmentModal";
+import AddCategoryModal from "./components/AddCategoryModal";
+import AddPlanModal from "./components/AddPlanModal";
+import LoginPage from "./components/LoginPage";
+import { api } from "./services/api";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentUser, setCurrentUser] = useState(() => api.getCurrentUser());
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Core Data State from Real MongoDB
   const [stats, setStats] = useState(null);
@@ -34,7 +33,7 @@ export default function App() {
   const [referrals, setReferrals] = useState({});
   const [languages, setLanguages] = useState([]);
   const [subAdmins, setSubAdmins] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Modals
   const [allotmentUser, setAllotmentUser] = useState(null);
@@ -44,12 +43,13 @@ export default function App() {
   // Toast
   const [toast, setToast] = useState(null);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   };
 
   const loadDashboardData = async () => {
+    if (!currentUser) return;
     setLoading(true);
     try {
       const [
@@ -71,84 +71,83 @@ export default function App() {
         api.getShares(),
         api.getReferrals(),
         api.getLanguages(),
-        api.getSubAdmins()
+        currentUser.role === "super_admin" ? api.getSubAdmins() : Promise.resolve([])
       ]);
 
       setStats(statsData);
       setAnalytics(analyticsData);
-      setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);
-      setCategories(Array.isArray(catsData) ? catsData : catsData?.categories || []);
-      setPlans(Array.isArray(plansData) ? plansData : plansData?.plans || []);
-      setShares(Array.isArray(sharesData) ? sharesData : sharesData?.shares || []);
+      setUsers(usersData);
+      setCategories(catsData);
+      setPlans(plansData);
+      setShares(sharesData);
       setReferrals(refsData);
-      setLanguages(Array.isArray(langsData) ? langsData : langsData?.languages || []);
+      setLanguages(langsData);
       setSubAdmins(subAdminsData || []);
     } catch (err) {
-      console.error('Failed to load real DB data:', err);
-      showToast('Error syncing with backend', 'error');
+      console.error("Dashboard data load failed:", err);
+      showToast("Notice: Synchronizing live database state", "info");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const handleLogin = async (email, password) => {
-    try {
-      const { user } = await api.login(email, password);
-      setCurrentUser(user);
-      setShowLoginModal(false);
-      showToast(`Logged in as ${user.name} (${user.role})`);
-      // If current active tab is restricted, switch to overview
-      const isSuper = user.role === 'super_admin';
-      const perms = user.permissions || ['overview'];
-      if (!isSuper && !perms.includes(activeTab)) {
-        setActiveTab('overview');
-      }
+    if (currentUser) {
       loadDashboardData();
-    } catch (e) {
-      showToast(e.message || 'Login failed', 'error');
-      throw e;
     }
+  }, [currentUser]);
+
+  // Auth Handlers
+  const handleLogin = async (loginId, password) => {
+    const { user } = await api.login(loginId, password);
+    setCurrentUser(user);
+    if (user.role === "super_admin") {
+      setActiveTab("overview");
+    } else {
+      const perms = Array.isArray(user.permissions) ? user.permissions : [];
+      setActiveTab(perms.includes("overview") ? "overview" : (perms[0] || "overview"));
+    }
+    showToast(`Welcome, ${user.name}!`);
   };
 
   const handleLogout = () => {
-    setShowLoginModal(true);
+    api.logout();
+    setCurrentUser(null);
+    showToast("Signed out of admin console");
   };
 
-  const handleAllotPlan = async (userId, planData) => {
+  // Plan Allotment
+  const handleAllotPlan = async (userId, allotmentData) => {
     try {
-      await api.allotUserPlan(userId, planData);
-      setUsers(prev => prev.map(u => ((u.id || u._id) === userId ? { ...u, plan: planData.plan } : u)));
+      await api.allotUserPlan(userId, allotmentData);
       setAllotmentUser(null);
-      showToast(`Plan updated to ${planData.plan} successfully`);
+      showToast("Subscription plan allotted successfully in live database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to update user plan', 'error');
+      showToast(err.message || "Failed to allot plan", "error");
     }
   };
 
-  const handleAddCategory = async (catData) => {
+  // Category Actions
+  const handleAddCategory = async (categoryData) => {
     try {
-      await api.createCategory(catData);
+      await api.createCategory(categoryData);
       setShowAddCategoryModal(false);
-      showToast('Category created in live database');
+      showToast("Category created in live database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to create category', 'error');
+      showToast("Failed to create category", "error");
     }
   };
 
-  const handleDeleteCategory = async (catId, catName) => {
-    if (!window.confirm(`Are you sure you want to remove "${catName}"?`)) return;
+  const handleDeleteCategory = async (catId) => {
+    if (!window.confirm("Delete this category? Documents inside will remain safe.")) return;
     try {
       await api.deleteCategory(catId);
-      showToast('Category removed from live database');
+      showToast("Category removed from live database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to delete category', 'error');
+      showToast("Failed to delete category", "error");
     }
   };
 
@@ -158,17 +157,17 @@ export default function App() {
       showToast(`Added "${subName}" subcategory to database`);
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to add subcategory', 'error');
+      showToast("Failed to add subcategory", "error");
     }
   };
 
   const handleDeleteSubcategory = async (catId, subId) => {
     try {
       await api.deleteSubcategory(catId, subId);
-      showToast('Removed subcategory from database');
+      showToast("Removed subcategory from database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to remove subcategory', 'error');
+      showToast("Failed to remove subcategory", "error");
     }
   };
 
@@ -176,10 +175,10 @@ export default function App() {
     try {
       await api.createPlan(planData);
       setShowAddPlanModal(false);
-      showToast('Plan created in live database');
+      showToast("Plan created in live database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to create plan', 'error');
+      showToast("Failed to create plan", "error");
     }
   };
 
@@ -187,21 +186,21 @@ export default function App() {
     if (!window.confirm(`Are you sure you want to deactivate "${planName}"?`)) return;
     try {
       await api.deletePlan(planId);
-      showToast('Plan deactivated');
+      showToast("Plan deactivated");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to delete plan', 'error');
+      showToast("Failed to delete plan", "error");
     }
   };
 
   const handleRevokeShare = async (shareId) => {
-    if (!window.confirm('Revoke this share link immediately? It will no longer be accessible.')) return;
+    if (!window.confirm("Revoke this share link immediately? It will no longer be accessible.")) return;
     try {
       await api.revokeShareLink(shareId);
-      showToast('Shared link revoked in live database');
+      showToast("Shared link revoked in live database");
       loadDashboardData();
     } catch (err) {
-      showToast('Failed to revoke link', 'error');
+      showToast("Failed to revoke link", "error");
     }
   };
 
@@ -212,7 +211,7 @@ export default function App() {
       showToast(`Sub-Admin "${adminData.name}" created successfully`);
       loadDashboardData();
     } catch (err) {
-      showToast(err.message || 'Failed to create sub-admin', 'error');
+      showToast(err.message || "Failed to create sub-admin", "error");
       throw err;
     }
   };
@@ -220,10 +219,10 @@ export default function App() {
   const handleUpdateSubAdmin = async (id, adminData) => {
     try {
       await api.updateSubAdmin(id, adminData);
-      showToast('Sub-Admin permissions updated');
+      showToast("Sub-Admin permissions updated");
       loadDashboardData();
     } catch (err) {
-      showToast(err.message || 'Failed to update sub-admin', 'error');
+      showToast(err.message || "Failed to update sub-admin", "error");
       throw err;
     }
   };
@@ -235,22 +234,40 @@ export default function App() {
       showToast(`Sub-Admin "${name}" deleted`);
       loadDashboardData();
     } catch (err) {
-      showToast(err.message || 'Failed to delete sub-admin', 'error');
+      showToast(err.message || "Failed to delete sub-admin", "error");
     }
   };
 
+  // If not logged in, render the full-screen Login Page directly!
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-950">
+        {toast && (
+          <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-2xl border shadow-xl text-xs font-bold flex items-center gap-2 animate-slideDown ${
+            toast.type === "error"
+              ? "bg-rose-50 border-rose-200 text-rose-700"
+              : "bg-indigo-600 text-white shadow-indigo-500/25"
+          }`}>
+            <span>{toast.message}</span>
+          </div>
+        )}
+        <LoginPage onLoginSuccess={handleLogin} />
+      </div>
+    );
+  }
+
   // Check if current user has permission for active tab
-  const isSuper = currentUser?.role === 'super_admin';
-  const userPerms = currentUser?.permissions || ['overview'];
-  const hasAccess = isSuper || (activeTab === 'admins' ? isSuper : userPerms.includes(activeTab));
+  const isSuper = currentUser?.role === "super_admin";
+  const userPerms = currentUser?.permissions || ["overview"];
+  const hasAccess = isSuper || (activeTab === "admins" ? isSuper : userPerms.includes(activeTab));
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-900 overflow-hidden font-sans">
       {toast && (
         <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-2xl border shadow-xl text-xs font-bold flex items-center gap-2 animate-slideDown ${
-          toast.type === 'error'
-            ? 'bg-rose-50 border-rose-200 text-rose-700'
-            : 'bg-indigo-600 text-white shadow-indigo-500/25'
+          toast.type === "error"
+            ? "bg-rose-50 border-rose-200 text-rose-700"
+            : "bg-indigo-600 text-white shadow-indigo-500/25"
         }`}>
           <span>{toast.message}</span>
         </div>
@@ -272,7 +289,6 @@ export default function App() {
           setSearchQuery={setSearchQuery}
           user={currentUser}
           onLogout={handleLogout}
-          onOpenLogin={() => setShowLoginModal(true)}
           onRefresh={loadDashboardData}
         />
 
@@ -282,12 +298,12 @@ export default function App() {
             <AccessRestrictedTab
               activeTab={activeTab}
               user={currentUser}
-              onSwitchUser={() => setShowLoginModal(true)}
+              onSwitchUser={handleLogout}
               setActiveTab={setActiveTab}
             />
           ) : (
             <>
-              {activeTab === 'overview' && (
+              {activeTab === "overview" && (
                 <OverviewTab
                   stats={stats}
                   analytics={analytics}
@@ -296,7 +312,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'users' && (
+              {activeTab === "users" && (
                 <UsersTab
                   users={users}
                   onAllotPlan={(u) => setAllotmentUser(u)}
@@ -304,7 +320,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'geo' && (
+              {activeTab === "geo" && (
                 <StateDemographicsTab
                   users={users}
                   analytics={analytics}
@@ -312,7 +328,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'categories' && (
+              {activeTab === "categories" && (
                 <CategoriesTab
                   categories={categories}
                   onAddCategory={() => setShowAddCategoryModal(true)}
@@ -322,7 +338,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'plans' && (
+              {activeTab === "plans" && (
                 <PlansTab
                   plans={plans}
                   onAddPlan={() => setShowAddPlanModal(true)}
@@ -330,7 +346,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'storage' && (
+              {activeTab === "storage" && (
                 <StorageTab
                   stats={stats}
                   analytics={analytics}
@@ -338,27 +354,27 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'shares' && (
+              {activeTab === "shares" && (
                 <SharesTab
                   shares={shares}
                   onRevokeShare={handleRevokeShare}
                 />
               )}
 
-              {activeTab === 'referrals' && (
+              {activeTab === "referrals" && (
                 <ReferralsTab
                   referrals={referrals}
                   users={users}
                 />
               )}
 
-              {activeTab === 'languages' && (
+              {activeTab === "languages" && (
                 <LanguagesTab
                   languages={languages}
                 />
               )}
 
-              {activeTab === 'admins' && (
+              {activeTab === "admins" && isSuper && (
                 <AdminsTab
                   subAdmins={subAdmins}
                   onCreateSubAdmin={handleCreateSubAdmin}
@@ -391,13 +407,6 @@ export default function App() {
         <AddPlanModal
           onClose={() => setShowAddPlanModal(false)}
           onSave={handleAddPlan}
-        />
-      )}
-
-      {showLoginModal && (
-        <LoginModal
-          onLogin={handleLogin}
-          onClose={() => setShowLoginModal(false)}
         />
       )}
     </div>
