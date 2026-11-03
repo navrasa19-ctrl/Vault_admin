@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import OverviewTab from './components/OverviewTab';
 import UsersTab from './components/UsersTab';
+import StateDemographicsTab from './components/StateDemographicsTab';
 import CategoriesTab from './components/CategoriesTab';
 import PlansTab from './components/PlansTab';
 import StorageTab from './components/StorageTab';
@@ -205,6 +206,14 @@ export default function App() {
               stats={stats}
               analytics={analytics}
               users={users}
+              setActiveTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === 'geo' && (
+            <StateDemographicsTab
+              users={users}
+              analytics={analytics}
               setActiveTab={setActiveTab}
             />
           )}

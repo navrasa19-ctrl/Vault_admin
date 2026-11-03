@@ -18,6 +18,7 @@ export default function Sidebar({ activeTab, setActiveTab, stats }) {
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard, badge: 'Live' },
     { id: 'users', label: 'Users & Plans', icon: Users, count: stats?.totalUsers || 11 },
+    { id: 'geo', label: 'State Demographics', icon: MapPin, badge: 'India' },
     { id: 'categories', label: 'Categories & Taxonomy', icon: FolderTree },
     { id: 'plans', label: 'Monetization Plans', icon: CreditCard },
     { id: 'storage', label: 'Cloud Storage', icon: HardDrive },

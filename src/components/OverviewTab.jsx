@@ -124,13 +124,20 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
         <div className="lg:col-span-2 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 cursor-pointer hover:text-indigo-600 transition" onClick={() => setActiveTab && setActiveTab('geo')}>
                 <MapPin className="w-4 h-4 text-indigo-600" />
                 State-Wise User Demographics (India)
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">Real geographical distribution across registered Indian subscribers</p>
             </div>
-            {stateData.length > 0 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab && setActiveTab('geo')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition"
+              >
+                <span>Interactive Graph & Users →</span>
+              </button>
+              {stateData.length > 0 && (
               <button
                 onClick={handleExportStates}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition"
@@ -139,6 +146,7 @@ export default function OverviewTab({ stats, analytics, users = [], setActiveTab
                 <span>Export CSV</span>
               </button>
             )}
+            </div>
           </div>
 
           <div className="overflow-x-auto">
