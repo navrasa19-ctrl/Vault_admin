@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ShieldCheck, Download, Edit2, Crown, UserCheck } from 'lucide-react';
+import { Search, Download, Edit2, Crown, UserCheck } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
 export default function UsersTab({ users = [], onAllotPlan }) {
@@ -40,13 +40,13 @@ export default function UsersTab({ users = [], onAllotPlan }) {
   const getPlanBadge = (plan) => {
     switch (plan) {
       case 'BUSINESS':
-        return 'bg-purple-500/15 text-purple-300 border-purple-500/30';
+        return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'FAMILY':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'PREMIUM':
-        return 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30';
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       default:
-        return 'bg-slate-500/15 text-slate-300 border-slate-500/30';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
@@ -55,17 +55,17 @@ export default function UsersTab({ users = [], onAllotPlan }) {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Controls Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
         <div className="flex flex-wrap items-center gap-3 flex-1">
           {/* Search */}
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by name, email, phone..."
+              placeholder="Search subscribers by name, email, phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition"
             />
           </div>
 
@@ -73,7 +73,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
           <select
             value={selectedPlan}
             onChange={(e) => setSelectedPlan(e.target.value)}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500/50"
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-indigo-500 font-medium"
           >
             <option value="ALL">All Plans ({userList.length})</option>
             <option value="FREE">FREE</option>
@@ -86,7 +86,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500/50"
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-indigo-500 font-medium"
           >
             <option value="ALL">All States</option>
             {states.map(st => (
@@ -97,7 +97,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
 
         <button
           onClick={handleExportUsers}
-          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition"
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200 transition"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
@@ -105,38 +105,38 @@ export default function UsersTab({ users = [], onAllotPlan }) {
       </div>
 
       {/* Users Table */}
-      <div className="rounded-2xl bg-[#0F1523]/80 border border-slate-800 overflow-hidden shadow-2xl backdrop-blur-xl">
+      <div className="rounded-3xl bg-white border border-slate-200/90 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/60 text-slate-400 font-semibold uppercase tracking-wider">
-                <th className="py-3.5 px-4">Subscriber</th>
-                <th className="py-3.5 px-4">Contact</th>
-                <th className="py-3.5 px-4">Subscription Plan</th>
+              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider">
+                <th className="py-3.5 px-5">Subscriber Profile</th>
+                <th className="py-3.5 px-4">Contact Details</th>
+                <th className="py-3.5 px-4">Plan Quota</th>
                 <th className="py-3.5 px-4">State</th>
                 <th className="py-3.5 px-4">Documents</th>
-                <th className="py-3.5 px-4">Storage Used</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+                <th className="py-3.5 px-4">Storage Consumed</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((u) => {
                   const uid = u.id || u._id;
                   const isAdm = u.role === 'admin' || u.role === 'business_admin';
                   return (
-                    <tr key={uid} className="hover:bg-slate-800/30 transition">
+                    <tr key={uid} className="hover:bg-slate-50/80 transition">
                       {/* Name & Role */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-indigo-500/20">
                             {(u.name || u.email || 'U').charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-semibold text-white flex items-center gap-1.5">
+                            <div className="font-bold text-slate-900 flex items-center gap-1.5">
                               <span>{u.name || 'Unnamed User'}</span>
                               {isAdm && (
-                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase">
+                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase">
                                   <Crown className="w-2.5 h-2.5" />
                                   Admin
                                 </span>
@@ -149,7 +149,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
 
                       {/* Contact */}
                       <td className="py-3.5 px-4">
-                        <div className="text-slate-200">{u.email || 'No email registered'}</div>
+                        <div className="text-slate-800 font-medium">{u.email || 'No email registered'}</div>
                         <div className="text-[11px] text-slate-400 font-mono">{u.phone || u.phoneNumber || 'No phone'}</div>
                       </td>
 
@@ -161,25 +161,25 @@ export default function UsersTab({ users = [], onAllotPlan }) {
                       </td>
 
                       {/* State */}
-                      <td className="py-3.5 px-4 text-slate-300">
+                      <td className="py-3.5 px-4 font-medium text-slate-700">
                         {u.state || 'Maharashtra'}
                       </td>
 
                       {/* Document count */}
                       <td className="py-3.5 px-4">
-                        <span className="font-bold text-white text-sm">{u.documentCount || 0}</span>
+                        <span className="font-extrabold text-slate-900 text-sm">{u.documentCount || 0}</span>
                       </td>
 
                       {/* Storage */}
-                      <td className="py-3.5 px-4 text-slate-300 font-mono">
+                      <td className="py-3.5 px-4 text-slate-700 font-mono font-medium">
                         {u.storageMB ? `${u.storageMB} MB` : u.storageBytes ? `${(u.storageBytes/1048576).toFixed(2)} MB` : '0 MB'}
                       </td>
 
                       {/* Actions */}
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-5 text-right">
                         <button
                           onClick={() => onAllotPlan && onAllotPlan(u)}
-                          className="px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition text-xs font-semibold inline-flex items-center gap-1.5"
+                          className="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 hover:border-indigo-600 transition text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 shadow-sm"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                           <span>Allot Plan</span>
@@ -190,7 +190,7 @@ export default function UsersTab({ users = [], onAllotPlan }) {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-12 text-center text-slate-500 text-sm">
+                  <td colSpan="7" className="py-12 text-center text-slate-400 text-sm">
                     No registered subscribers found matching query.
                   </td>
                 </tr>

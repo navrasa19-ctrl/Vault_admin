@@ -12,13 +12,11 @@ import LanguagesTab from './components/LanguagesTab';
 import PlanAllotmentModal from './components/PlanAllotmentModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import AddPlanModal from './components/AddPlanModal';
-import LoginModal from './components/LoginModal';
 import { api, DEFAULT_ADMIN_USER } from './services/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [currentUser, setCurrentUser] = useState(DEFAULT_ADMIN_USER);
 
   // Core Data State from Real MongoDB
@@ -36,7 +34,6 @@ export default function App() {
   const [allotmentUser, setAllotmentUser] = useState(null);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [showAddPlanModal, setShowAddPlanModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Toast
   const [toast, setToast] = useState(null);
@@ -80,26 +77,8 @@ export default function App() {
     loadDashboardData();
   }, []);
 
-  const handleLogin = async (email, otp) => {
-    try {
-      const res = await api.login(email, otp);
-      if (res && res.token) {
-        setIsLoggedIn(true);
-        setCurrentUser(res.user || DEFAULT_ADMIN_USER);
-        setShowLoginModal(false);
-        showToast('Authorized as Master Admin');
-        loadDashboardData();
-        return true;
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-    }
-    return false;
-  };
-
   const handleLogout = () => {
     api.logout();
-    setIsLoggedIn(false);
     showToast('Signed out of Admin Console');
   };
 
@@ -191,23 +170,25 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[#07090E] text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#F8FAFC] text-slate-900 overflow-hidden font-sans">
       {toast && (
-        <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl border shadow-2xl text-xs font-semibold flex items-center gap-2 animate-slideDown ${
+        <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-2xl border shadow-xl text-xs font-bold flex items-center gap-2 animate-slideDown ${
           toast.type === 'error'
-            ? 'bg-rose-950/90 border-rose-500/50 text-rose-300'
-            : 'bg-indigo-950/90 border-indigo-500/50 text-indigo-200'
+            ? 'bg-rose-50 border-rose-200 text-rose-700'
+            : 'bg-indigo-600 text-white shadow-indigo-500/25'
         }`}>
           <span>{toast.message}</span>
         </div>
       )}
 
+      {/* Sidebar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         stats={stats}
       />
 
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
           activeTab={activeTab}
@@ -215,7 +196,6 @@ export default function App() {
           setSearchQuery={setSearchQuery}
           user={currentUser}
           onLogout={handleLogout}
-          onOpenLogin={() => setShowLoginModal(true)}
           onRefresh={loadDashboardData}
         />
 
@@ -305,13 +285,6 @@ export default function App() {
         <AddPlanModal
           onClose={() => setShowAddPlanModal(false)}
           onSave={handleAddPlan}
-        />
-      )}
-
-      {showLoginModal && (
-        <LoginModal
-          onLogin={handleLogin}
-          onClose={() => setShowLoginModal(false)}
         />
       )}
     </div>

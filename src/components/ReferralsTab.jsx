@@ -51,19 +51,19 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Gift className="w-5 h-5 text-pink-400" />
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-indigo-600" />
             Refer & Earn Growth Engine & Conversion Tracking
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Real MongoDB referral ledger, organic conversion funnel, bonus quotas, and promoter champions.
           </p>
         </div>
         <button
           onClick={handleExport}
-          className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition flex items-center gap-2"
+          className="px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition flex items-center gap-2"
         >
           <span>Export CSV</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -72,49 +72,48 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
 
       {/* 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3 font-semibold uppercase">
             <span>Total Referrals Triggered</span>
-            <Users className="w-4 h-4 text-indigo-400" />
+            <Users className="w-4 h-4 text-indigo-600" />
           </div>
-          <div className="text-2xl font-black text-white">{metrics.totalReferrals || 0}</div>
-          <div className="text-xs text-indigo-400 mt-1 font-medium">From organic signups</div>
+          <div className="text-3xl font-extrabold text-slate-900">{metrics.totalReferrals || 0}</div>
+          <div className="text-xs text-indigo-600 mt-1 font-semibold">From organic signups</div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3 font-semibold uppercase">
             <span>Completed Conversions</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-emerald-400">{metrics.convertedReferrals || 0}</div>
-          <div className="text-xs text-slate-400 mt-1">Qualified vault registrations</div>
+          <div className="text-3xl font-extrabold text-emerald-600">{metrics.convertedReferrals || 0}</div>
+          <div className="text-xs text-slate-500 mt-1 font-medium">Qualified vault registrations</div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3 font-semibold uppercase">
             <span>Conversion Velocity</span>
-            <TrendingUp className="w-4 h-4 text-purple-400" />
+            <TrendingUp className="w-4 h-4 text-violet-600" />
           </div>
-          <div className="text-2xl font-black text-purple-400">{metrics.conversionRate || 100}%</div>
-          <div className="text-xs text-slate-400 mt-1">Invite-to-activation ratio</div>
+          <div className="text-3xl font-extrabold text-violet-600">{metrics.conversionRate || 100}%</div>
+          <div className="text-xs text-slate-500 mt-1 font-medium">Invite-to-activation ratio</div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3 font-semibold uppercase">
             <span>Rewards Allocated</span>
-            <Coins className="w-4 h-4 text-amber-400" />
+            <Coins className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-2xl font-black text-amber-400">{metrics.totalStorageBonusGB || 0} GB</div>
-          <div className="text-xs text-slate-400 mt-1">Bonus cloud storage granted</div>
+          <div className="text-3xl font-extrabold text-amber-600">{metrics.totalStorageBonusGB || 0} GB</div>
+          <div className="text-xs text-slate-500 mt-1 font-medium">Bonus cloud storage granted</div>
         </div>
       </div>
 
-      {/* Top Referrers Leaderboard & Rewards Structure */}
+      {/* Top Referrers Leaderboard */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Leaderboard */}
-        <div className="p-6 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl lg:col-span-2">
-          <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
-            <Award className="w-4 h-4 text-amber-400" />
+        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm lg:col-span-2">
+          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-4">
+            <Award className="w-4 h-4 text-amber-500" />
             Top Community Champions (Leaderboard)
           </h3>
           <div className="space-y-3">
@@ -122,117 +121,69 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
               topReferrers.map((item, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
                       idx === 0
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : 'bg-slate-800 text-slate-300 border border-slate-700'
+                        ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                        : 'bg-slate-200 text-slate-700'
                     }`}>
                       #{idx + 1}
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-sm">{item.name || item.email}</div>
-                      <div className="text-[11px] font-mono text-indigo-400">{item.email}</div>
+                      <div className="font-bold text-slate-900 text-sm">{item.name || item.email}</div>
+                      <div className="text-[11px] font-mono text-indigo-600">{item.email}</div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <div className="font-bold text-white text-sm">{item.referralCount || 1}</div>
-                      <div className="text-[10px] text-slate-400 uppercase">Invites</div>
+                      <div className="font-extrabold text-slate-900 text-sm">{item.referralCount || 1}</div>
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Invites</div>
                     </div>
                     <div>
-                      <div className="font-bold text-emerald-400 text-sm">+{item.referralCredits || 1} GB</div>
-                      <div className="text-[10px] text-slate-400 uppercase">Bonus Earned</div>
+                      <div className="font-extrabold text-emerald-600 text-sm">+{item.referralCredits || 1} GB</div>
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Bonus Earned</div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="p-6 rounded-xl bg-slate-900/40 text-center text-slate-400 text-xs">
-                Aarav Sharma (Code: <span className="text-indigo-400 font-mono">AARAV100</span>) - 1 Qualified Invite (+1 GB Awarded)
+              <div className="p-6 rounded-2xl bg-slate-50 text-center text-slate-500 text-xs">
+                Aarav Sharma (Code: <span className="text-indigo-600 font-mono font-bold">AARAV100</span>) - 1 Qualified Invite (+1 GB Awarded)
               </div>
             )}
           </div>
         </div>
 
-        {/* Reward Rules Widget */}
-        <div className="p-6 rounded-2xl bg-gradient-to-b from-purple-950/30 to-[#0F1523]/80 border border-purple-500/20 backdrop-blur-xl flex flex-col justify-between">
+        {/* Program Rules */}
+        <div className="p-6 rounded-3xl bg-gradient-to-br from-indigo-50/60 via-violet-50/40 to-white border border-indigo-100 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-4">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Program Rules</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100/80 text-indigo-700 text-xs font-bold mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <span>Incentive Mechanics</span>
             </div>
-            <h4 className="font-bold text-white text-base">Referral Incentives</h4>
-            <ul className="mt-4 space-y-3 text-xs text-slate-300">
+            <h4 className="font-extrabold text-slate-900 text-base">Referral Rules</h4>
+            <ul className="mt-4 space-y-3 text-xs text-slate-600 font-medium">
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Referrer receives <strong className="text-white">+1 GB</strong> extra cloud storage on friend signup.</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Referrer receives <strong className="text-slate-900">+1 GB</strong> extra cloud storage on friend signup.</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Invited friend gets <strong className="text-white">Premium Tier</strong> 30-day trial for free.</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span>Invited friend gets <strong className="text-slate-900">Premium Tier</strong> 30-day trial for free.</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>Maximum 50 GB storage bonus cap per account.</span>
               </li>
             </ul>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-            <span className="text-[11px] text-slate-400">Automated verification via OTP & device ID fingerprint</span>
+          <div className="mt-6 pt-4 border-t border-indigo-100 text-center">
+            <span className="text-[11px] text-slate-400 font-medium">Automated verification via OTP & device ID fingerprint</span>
           </div>
-        </div>
-      </div>
-
-      {/* Referral Activity Logs Table */}
-      <div className="rounded-2xl bg-[#0F1523]/80 border border-slate-800 overflow-hidden shadow-2xl backdrop-blur-xl">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <h3 className="font-semibold text-white text-sm">Real Referral Activity Stream</h3>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-800 bg-slate-900/60 text-slate-400 font-semibold uppercase tracking-wider">
-                <th className="py-3 px-4">Referrer</th>
-                <th className="py-3 px-4">Code Used</th>
-                <th className="py-3 px-4">Referred User</th>
-                <th className="py-3 px-4">Bonus Granted</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60">
-              {filteredReferrals.length > 0 ? (
-                filteredReferrals.map((r, i) => (
-                  <tr key={i} className="hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 font-medium text-white">{r.referrerName || r.referrerEmail}</td>
-                    <td className="py-3 px-4 font-mono text-indigo-400 font-semibold">{r.code || 'AARAV100'}</td>
-                    <td className="py-3 px-4 text-slate-300">{r.referredName || r.referredEmail}</td>
-                    <td className="py-3 px-4 font-semibold text-emerald-400">+1 GB Storage</td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                        {r.status || 'converted'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-slate-400 font-mono text-[11px]">
-                      {new Date(r.createdAt || Date.now()).toLocaleDateString('en-IN')}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="py-8 text-center text-slate-500 text-xs">
-                    No referral entries found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

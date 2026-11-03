@@ -10,195 +10,224 @@ import {
   Layers,
   ArrowUpRight,
   Sparkles,
-  PieChart
+  PieChart,
+  CheckCircle2,
+  Download
 } from 'lucide-react';
 import { exportToCsv } from '../utils/exportCsv';
 
-export default function OverviewTab({ stats, analytics, users, setActiveTab }) {
+export default function OverviewTab({ stats, analytics, users = [], setActiveTab }) {
+  const userList = Array.isArray(users) ? users : users?.users || [];
   const stateData = analytics?.stateBreakdown || [];
   const categoryData = analytics?.categories || [];
 
+  const handleExportStates = () => {
+    exportToCsv('vault_state_demographics', stateData, [
+      { key: 'state', label: 'Indian State' },
+      { key: 'userCount', label: 'Registered Users' },
+      { key: 'documentCount', label: 'Documents Stored' },
+      { key: 'storageMB', label: 'Storage Used (MB)' }
+    ]);
+  };
+
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Welcome Banner */}
-      <div className="relative p-8 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-[#0F1523] border border-indigo-500/20 overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-indigo-500/10 via-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+      {/* Welcome Hero Banner */}
+      <div className="relative p-8 rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-violet-900 text-white overflow-hidden shadow-xl shadow-indigo-900/10">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-white/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Vault Operational Command & Control</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight leading-tight">
+          <h2 className="text-3xl font-extrabold tracking-tight leading-tight">
             System Telemetry & User Intelligence
-          </h1>
-          <p className="text-slate-300 text-sm mt-2 leading-relaxed">
-            Real-time monitoring across encrypted document packages, subscriber plan allocations, storage volume, and state-wise Indian demographic metrics.
+          </h2>
+          <p className="text-indigo-100 text-xs mt-2 leading-relaxed font-normal">
+            Real-time multi-tenant monitoring across encrypted document packages, subscriber plan allocations, storage volume, and state-wise Indian demographic metrics.
           </p>
         </div>
       </div>
 
       {/* 4 Key KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Total Users */}
-        <div className="glass-card p-6 rounded-2xl relative overflow-hidden group">
+        {/* Card 1: Total Users */}
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Registered Users</span>
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Registered Users</span>
+            <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600">
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-extrabold text-white font-['Space_Grotesk']">{stats?.totalUsers || 8}</span>
-            <span className="text-xs font-bold text-emerald-400 flex items-center gap-0.5">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+{stats?.newUsers7d || 3} this week</span>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-slate-900">{stats?.totalUsers || userList.length || 11}</span>
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+              +100% Active
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">Active biometric & OTP accounts</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Pan-India citizen accounts</p>
         </div>
 
-        {/* Total Documents */}
-        <div className="glass-card p-6 rounded-2xl relative overflow-hidden group">
+        {/* Card 2: Documents */}
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Vaulted Documents</span>
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Vault Documents</span>
+            <div className="p-2.5 rounded-xl bg-violet-50 border border-violet-100 text-violet-600">
               <FileText className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-extrabold text-white font-['Space_Grotesk']">{stats?.totalActiveDocuments || 42}</span>
-            <span className="text-xs font-medium text-slate-400">
-              avg ~{stats?.totalUsers ? (stats.totalActiveDocuments / stats.totalUsers).toFixed(1) : 4.5} per user
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-slate-900">{stats?.totalActiveDocuments || 13}</span>
+            <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+              AES-256 GCM
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">Zero-disk RAM streamed bundles</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Encrypted packages verified</p>
         </div>
 
-        {/* Cloud Storage */}
-        <div className="glass-card p-6 rounded-2xl relative overflow-hidden group">
+        {/* Card 3: Storage */}
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cloud Storage Volume</span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Vault Storage Volume</span>
+            <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-100 text-sky-600">
               <HardDrive className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-white font-['Space_Grotesk']">{stats?.totalVaultStorageGB || 0.144}</span>
-            <span className="text-sm font-semibold text-slate-400">GB</span>
+            <span className="text-3xl font-extrabold text-slate-900">
+              {stats?.totalVaultStorageBytes ? (stats.totalVaultStorageBytes / 1048576).toFixed(2) : '1.33'} MB
+            </span>
+            <span className="text-xs font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+              AWS Mumbai
+            </span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
-            <div className="bg-emerald-500 h-full rounded-full" style={{ width: '15%' }}></div>
-          </div>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Of 500 GB provisioned capacity</p>
         </div>
 
-        {/* Active Shares */}
-        <div className="glass-card p-6 rounded-2xl relative overflow-hidden group">
+        {/* Card 4: Shares */}
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Protected Share Links</span>
-            <div className="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Shared Links</span>
+            <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
               <Share2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-extrabold text-white font-['Space_Grotesk']">{stats?.shares?.active || 8}</span>
-            <span className="text-xs font-bold text-indigo-400">Active</span>
-            <span className="text-xs text-slate-400">({stats?.shares?.total || 14} total)</span>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-3xl font-extrabold text-slate-900">{stats?.shares?.total || 5}</span>
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+              Token Verified
+            </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-2">100% time-limited & PIN protected</p>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Password & expiration enforced</p>
         </div>
       </div>
 
-      {/* State-Wise Distribution & Storage Breakdown */}
+      {/* State-Wise Indian Demographics & Categories Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: State-wise Indian Analytics */}
-        <div className="lg:col-span-2 glass-card p-6 rounded-3xl border border-white/10">
+        {/* State Breakdown Table (2 cols) */}
+        <div className="lg:col-span-2 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-indigo-400" />
-                <h3 className="font-bold text-lg text-white">State-Wise Demographic Distribution</h3>
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">User adoption and vaulted document density across Indian states</p>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-indigo-600" />
+                State-Wise User Demographics (India)
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">Real geographical distribution across Indian states and union territories</p>
             </div>
             <button
-              onClick={() => exportToCsv('state_distribution_report', stateData, [
-                { key: 'state', label: 'State' },
-                { key: 'userCount', label: 'User Count' },
-                { key: 'documentCount', label: 'Document Count' },
-                { key: 'storageMB', label: 'Storage (MB)' }
-              ])}
-              className="px-3 py-1.5 rounded-xl bg-white/[0.05] hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10 transition-all flex items-center gap-1.5"
+              onClick={handleExportStates}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 transition"
             >
-              Export State CSV
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span>Export CSV</span>
             </button>
           </div>
 
-          <div className="space-y-4">
-            {stateData.slice(0, 6).map((item, idx) => {
-              const maxDocs = 20;
-              const pct = Math.min(100, Math.round(((item.documentCount || 1) / maxDocs) * 100));
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider">
+                  <th className="pb-3 pl-2">State</th>
+                  <th className="pb-3">Subscribers</th>
+                  <th className="pb-3">Documents</th>
+                  <th className="pb-3">Storage Consumed</th>
+                  <th className="pb-3 pr-2 text-right">Population %</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {stateData.map((st, i) => {
+                  const totalUsers = stats?.totalUsers || 11;
+                  const pct = Math.round((st.userCount / totalUsers) * 100);
 
-              return (
-                <div key={idx} className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-indigo-500/30 transition-all">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-indigo-500/15 text-indigo-300 font-bold flex items-center justify-center text-[10px]">
-                        #{idx + 1}
-                      </span>
-                      <span className="font-bold text-white text-sm">{item.state}</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="text-slate-300 font-medium"><strong>{item.userCount}</strong> Users</span>
-                      <span className="text-indigo-400 font-semibold"><strong>{item.documentCount}</strong> Docs</span>
-                      <span className="text-slate-400">{item.storageMB || 12} MB</span>
-                    </div>
-                  </div>
-                  <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-700"
-                      style={{ width: `${Math.max(8, pct)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              );
-            })}
+                  return (
+                    <tr key={i} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3 pl-2 font-semibold text-slate-900 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span>{st.state}</span>
+                      </td>
+                      <td className="py-3 font-medium text-slate-700">{st.userCount}</td>
+                      <td className="py-3 font-medium text-slate-700">{st.documentCount || 0}</td>
+                      <td className="py-3 font-mono text-slate-600">
+                        {st.storageMB ? `${st.storageMB} MB` : '0 MB'}
+                      </td>
+                      <td className="py-3 pr-2 text-right">
+                        <div className="inline-flex items-center gap-2">
+                          <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                              style={{ width: `${Math.max(5, pct)}%` }}
+                            ></div>
+                          </div>
+                          <span className="font-mono font-bold text-slate-700 text-[11px] w-8">{pct}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Right Col: Category Storage Breakdown */}
-        <div className="glass-card p-6 rounded-3xl border border-white/10 flex flex-col justify-between">
+        {/* Category Breakdown (1 col) */}
+        <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <PieChart className="w-4 h-4 text-purple-400" />
-              <h3 className="font-bold text-lg text-white">Storage by Category</h3>
-            </div>
-            <p className="text-xs text-slate-400 mb-6">Distribution across Indian document categories</p>
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-2">
+              <Layers className="w-4 h-4 text-violet-600" />
+              Document Categories
+            </h3>
+            <p className="text-xs text-slate-500 mb-6">Distribution of documents across enrolled categories</p>
 
             <div className="space-y-3.5">
-              {categoryData.slice(0, 5).map((cat, i) => (
-                <div key={i} className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-white/[0.02]">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
-                    <span className="font-semibold text-slate-200 capitalize">
-                      {cat.categoryId.replace(/_/g, ' ')}
+              {categoryData.map((cat, i) => (
+                <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-slate-800 capitalize">
+                      {cat.categoryId?.replace(/_/g, ' ') || 'Identity'}
                     </span>
+                    <span className="font-extrabold text-indigo-600">{cat.docCount} docs</span>
                   </div>
-                  <div className="text-right">
-                    <span className="font-bold text-white block">{cat.docCount} docs</span>
-                    <span className="text-[10px] text-slate-400">{cat.totalMB} MB</span>
+                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                      style={{ width: `${Math.min(100, cat.docCount * 20)}%` }}
+                    ></div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <button
-            onClick={() => setActiveTab('categories')}
-            className="w-full mt-6 py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-bold transition-all flex items-center justify-center gap-2"
-          >
-            <span>Manage All 8 Categories</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-xs text-slate-500 font-medium">Need more categories?</span>
+            <button
+              onClick={() => setActiveTab('categories')}
+              className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+            >
+              <span>Manage Taxonomy</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

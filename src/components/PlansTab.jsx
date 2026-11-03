@@ -5,13 +5,11 @@ import {
   Check,
   HardDrive,
   Users,
-  Edit2,
   Trash2,
-  ToggleLeft,
-  ToggleRight
+  Sparkles
 } from 'lucide-react';
 
-export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePlan, onTogglePlan }) {
+export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
   const planList = Array.isArray(plans) ? plans : plans?.plans || [];
 
   const getPrice = (plan) => {
@@ -33,7 +31,6 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
       if (plan.features.expiryReminders) list.push('Automated Expiry Push Reminders');
       if (plan.features.biometricLock) list.push('Biometric FaceID / Fingerprint Lock');
       if (plan.features.bulkUploadLimit) list.push(`Bulk Upload Up to ${plan.features.bulkUploadLimit} Files`);
-      if (plan.features.bulkOcr) list.push('Batch OCR Queue Processing');
       list.push('10 Official Indian Languages');
       return list;
     }
@@ -43,19 +40,19 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-[#0F1523]/80 border border-slate-800 backdrop-blur-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-purple-400" />
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-indigo-600" />
             Subscription Tiers & Monetization Matrix
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Real MongoDB Subscription Plans. Configured with storage allowances, feature gates, and INR pricing.
+          <p className="text-xs text-slate-500 mt-1">
+            Real MongoDB Subscription Plans with storage allowances, feature gates, and INR pricing.
           </p>
         </div>
         <button
           onClick={onAddPlan}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium text-xs hover:from-purple-600 hover:to-indigo-700 transition shadow-lg shadow-purple-500/20 active:scale-95"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-md shadow-indigo-500/20 active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Create New Plan</span>
@@ -74,14 +71,14 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
           return (
             <div
               key={planId}
-              className={`relative rounded-3xl p-6 border flex flex-col justify-between transition-all duration-300 hover:shadow-2xl ${
+              className={`relative rounded-3xl p-6 border flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
                 isPopular
-                  ? 'bg-gradient-to-b from-indigo-950/40 via-[#0F1523] to-[#0B0F19] border-indigo-500/40 shadow-indigo-500/10'
-                  : 'bg-[#0F1523]/90 border-slate-800 hover:border-slate-700'
+                  ? 'bg-gradient-to-b from-indigo-50/50 via-white to-white border-indigo-400 shadow-md shadow-indigo-500/10'
+                  : 'bg-white border-slate-200/90 shadow-sm'
               }`}
             >
               {isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[10px] font-bold tracking-wider uppercase shadow-md">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-[10px] font-extrabold tracking-wider uppercase shadow-md">
                   Most Popular
                 </div>
               )}
@@ -90,8 +87,8 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 {/* Plan Header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight">{plan.name || tier}</h3>
-                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-1 inline-block">
+                    <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">{plan.name || tier}</h3>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 mt-1 inline-block font-bold">
                       {tier}
                     </span>
                   </div>
@@ -99,7 +96,7 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                     {!['FREE', 'PREMIUM'].includes(tier) && (
                       <button
                         onClick={() => onDeletePlan && onDeletePlan(plan.planId || tier, plan.name)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                         title="Delete plan"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -109,41 +106,41 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
                 </div>
 
                 {/* Price Display */}
-                <div className="mt-5 pb-5 border-b border-slate-800/80">
+                <div className="mt-5 pb-5 border-b border-slate-100">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-white">
+                    <span className="text-3xl font-extrabold text-slate-900">
                       ₹{price}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">/{plan.interval || 'month'}</span>
+                    <span className="text-xs text-slate-500 font-medium">/{plan.interval || 'month'}</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">Encrypted personal vault storage tier</p>
+                  <p className="text-xs text-slate-500 mt-1">Encrypted personal vault storage tier</p>
                 </div>
 
                 {/* Core Metrics */}
-                <div className="py-4 space-y-2.5 text-xs border-b border-slate-800/80">
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="flex items-center gap-2 text-slate-400">
-                      <HardDrive className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="py-4 space-y-2.5 text-xs border-b border-slate-100">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span className="flex items-center gap-2 text-slate-500">
+                      <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
                       Storage Allocation:
                     </span>
-                    <span className="font-semibold text-white">{plan.storageLimitGB || 5} GB</span>
+                    <span className="font-extrabold text-slate-900">{plan.storageLimitGB || 5} GB</span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="flex items-center gap-2 text-slate-400">
-                      <Users className="w-3.5 h-3.5 text-purple-400" />
-                      People / Devices:
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span className="flex items-center gap-2 text-slate-500">
+                      <Users className="w-3.5 h-3.5 text-violet-600" />
+                      Devices / Family:
                     </span>
-                    <span className="font-semibold text-white">{plan.peopleLimit || 1}</span>
+                    <span className="font-extrabold text-slate-900">{plan.peopleLimit || 1}</span>
                   </div>
                 </div>
 
                 {/* Features List */}
                 <div className="mt-4 space-y-2">
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Features Included</div>
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Features Included</div>
                   <ul className="space-y-1.5">
                     {features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs text-slate-300">
-                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                      <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -152,8 +149,8 @@ export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePl
               </div>
 
               {/* Status Badge */}
-              <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                <span className="text-xs px-2.5 py-1 rounded-full font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs px-2.5 py-1 rounded-full font-bold border bg-emerald-50 text-emerald-700 border-emerald-200">
                   Active in Live Database
                 </span>
               </div>
