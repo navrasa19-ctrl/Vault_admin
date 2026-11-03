@@ -10,15 +10,19 @@ import StorageTab from './components/StorageTab';
 import SharesTab from './components/SharesTab';
 import ReferralsTab from './components/ReferralsTab';
 import LanguagesTab from './components/LanguagesTab';
+import AdminsTab from './components/AdminsTab';
+import AccessRestrictedTab from './components/AccessRestrictedTab';
 import PlanAllotmentModal from './components/PlanAllotmentModal';
 import AddCategoryModal from './components/AddCategoryModal';
 import AddPlanModal from './components/AddPlanModal';
+import LoginModal from './components/LoginModal';
 import { api, DEFAULT_ADMIN_USER } from './services/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentUser, setCurrentUser] = useState(DEFAULT_ADMIN_USER);
+  const [currentUser, setCurrentUser] = useState(() => api.getCurrentUser());
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Core Data State from Real MongoDB
   const [stats, setStats] = useState(null);
@@ -29,6 +33,7 @@ export default function App() {
   const [shares, setShares] = useState([]);
   const [referrals, setReferrals] = useState({});
   const [languages, setLanguages] = useState([]);
+  const [subAdmins, setSubAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Modals
@@ -47,7 +52,17 @@ export default function App() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsData, analyticsData, usersData, catsData, plansData, sharesData, refsData, langsData] = await Promise.all([
+      const [
+        statsData,
+        analyticsData,
+        usersData,
+        catsData,
+        plansData,
+        sharesData,
+        refsData,
+        langsData,
+        subAdminsData
+      ] = await Promise.all([
         api.getStats(),
         api.getAnalytics(),
         api.getUsers(),
@@ -55,7 +70,8 @@ export default function App() {
         api.getPlans(),
         api.getShares(),
         api.getReferrals(),
-        api.getLanguages()
+        api.getLanguages(),
+        api.getSubAdmins()
       ]);
 
       setStats(statsData);
@@ -66,6 +82,7 @@ export default function App() {
       setShares(Array.isArray(sharesData) ? sharesData : sharesData?.shares || []);
       setReferrals(refsData);
       setLanguages(Array.isArray(langsData) ? langsData : langsData?.languages || []);
+      setSubAdmins(subAdminsData || []);
     } catch (err) {
       console.error('Failed to load real DB data:', err);
       showToast('Error syncing with backend', 'error');
@@ -78,9 +95,27 @@ export default function App() {
     loadDashboardData();
   }, []);
 
+  const handleLogin = async (email, password) => {
+    try {
+      const { user } = await api.login(email, password);
+      setCurrentUser(user);
+      setShowLoginModal(false);
+      showToast(`Logged in as ${user.name} (${user.role})`);
+      // If current active tab is restricted, switch to overview
+      const isSuper = user.role === 'super_admin';
+      const perms = user.permissions || ['overview'];
+      if (!isSuper && !perms.includes(activeTab)) {
+        setActiveTab('overview');
+      }
+      loadDashboardData();
+    } catch (e) {
+      showToast(e.message || 'Login failed', 'error');
+      throw e;
+    }
+  };
+
   const handleLogout = () => {
-    api.logout();
-    showToast('Signed out of Admin Console');
+    setShowLoginModal(true);
   };
 
   const handleAllotPlan = async (userId, planData) => {
@@ -170,6 +205,45 @@ export default function App() {
     }
   };
 
+  // Sub-Admins Handlers
+  const handleCreateSubAdmin = async (adminData) => {
+    try {
+      await api.createSubAdmin(adminData);
+      showToast(`Sub-Admin "${adminData.name}" created successfully`);
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message || 'Failed to create sub-admin', 'error');
+      throw err;
+    }
+  };
+
+  const handleUpdateSubAdmin = async (id, adminData) => {
+    try {
+      await api.updateSubAdmin(id, adminData);
+      showToast('Sub-Admin permissions updated');
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message || 'Failed to update sub-admin', 'error');
+      throw err;
+    }
+  };
+
+  const handleDeleteSubAdmin = async (id, name) => {
+    if (!window.confirm(`Remove Sub-Admin "${name}"? They will lose all access to the admin portal.`)) return;
+    try {
+      await api.deleteSubAdmin(id);
+      showToast(`Sub-Admin "${name}" deleted`);
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message || 'Failed to delete sub-admin', 'error');
+    }
+  };
+
+  // Check if current user has permission for active tab
+  const isSuper = currentUser?.role === 'super_admin';
+  const userPerms = currentUser?.permissions || ['overview'];
+  const hasAccess = isSuper || (activeTab === 'admins' ? isSuper : userPerms.includes(activeTab));
+
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-slate-900 overflow-hidden font-sans">
       {toast && (
@@ -182,11 +256,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar with RBAC locks */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         stats={stats}
+        currentUser={currentUser}
       />
 
       {/* Main Content Area */}
@@ -197,79 +272,101 @@ export default function App() {
           setSearchQuery={setSearchQuery}
           user={currentUser}
           onLogout={handleLogout}
+          onOpenLogin={() => setShowLoginModal(true)}
           onRefresh={loadDashboardData}
         />
 
         <main className="flex-1 overflow-y-auto p-8 max-w-7xl w-full mx-auto">
-          {activeTab === 'overview' && (
-            <OverviewTab
-              stats={stats}
-              analytics={analytics}
-              users={users}
+          {/* Permission Guard: If module is locked for sub-admin */}
+          {!hasAccess ? (
+            <AccessRestrictedTab
+              activeTab={activeTab}
+              user={currentUser}
+              onSwitchUser={() => setShowLoginModal(true)}
               setActiveTab={setActiveTab}
             />
-          )}
+          ) : (
+            <>
+              {activeTab === 'overview' && (
+                <OverviewTab
+                  stats={stats}
+                  analytics={analytics}
+                  users={users}
+                  setActiveTab={setActiveTab}
+                />
+              )}
 
-          {activeTab === 'geo' && (
-            <StateDemographicsTab
-              users={users}
-              analytics={analytics}
-              setActiveTab={setActiveTab}
-            />
-          )}
+              {activeTab === 'users' && (
+                <UsersTab
+                  users={users}
+                  onAllotPlan={(u) => setAllotmentUser(u)}
+                  onRefresh={loadDashboardData}
+                />
+              )}
 
-          {activeTab === 'users' && (
-            <UsersTab
-              users={users}
-              onAllotPlan={(u) => setAllotmentUser(u)}
-              onRefresh={loadDashboardData}
-            />
-          )}
+              {activeTab === 'geo' && (
+                <StateDemographicsTab
+                  users={users}
+                  analytics={analytics}
+                  setActiveTab={setActiveTab}
+                />
+              )}
 
-          {activeTab === 'categories' && (
-            <CategoriesTab
-              categories={categories}
-              onAddCategory={() => setShowAddCategoryModal(true)}
-              onDeleteCategory={handleDeleteCategory}
-              onAddSubcategory={handleAddSubcategory}
-              onDeleteSubcategory={handleDeleteSubcategory}
-            />
-          )}
+              {activeTab === 'categories' && (
+                <CategoriesTab
+                  categories={categories}
+                  onAddCategory={() => setShowAddCategoryModal(true)}
+                  onDeleteCategory={handleDeleteCategory}
+                  onAddSubcategory={handleAddSubcategory}
+                  onDeleteSubcategory={handleDeleteSubcategory}
+                />
+              )}
 
-          {activeTab === 'plans' && (
-            <PlansTab
-              plans={plans}
-              onAddPlan={() => setShowAddPlanModal(true)}
-              onDeletePlan={handleDeletePlan}
-            />
-          )}
+              {activeTab === 'plans' && (
+                <PlansTab
+                  plans={plans}
+                  onAddPlan={() => setShowAddPlanModal(true)}
+                  onDeletePlan={handleDeletePlan}
+                />
+              )}
 
-          {activeTab === 'storage' && (
-            <StorageTab
-              stats={stats}
-              analytics={analytics}
-              users={users}
-            />
-          )}
+              {activeTab === 'storage' && (
+                <StorageTab
+                  stats={stats}
+                  analytics={analytics}
+                  users={users}
+                />
+              )}
 
-          {activeTab === 'shares' && (
-            <SharesTab
-              shares={shares}
-              onRevokeShare={handleRevokeShare}
-            />
-          )}
+              {activeTab === 'shares' && (
+                <SharesTab
+                  shares={shares}
+                  onRevokeShare={handleRevokeShare}
+                />
+              )}
 
-          {activeTab === 'referrals' && (
-            <ReferralsTab
-              referrals={referrals}
-              users={users}
-            />
-          )}
+              {activeTab === 'referrals' && (
+                <ReferralsTab
+                  referrals={referrals}
+                  users={users}
+                />
+              )}
 
-          {activeTab === 'languages' && (
-            <LanguagesTab
-              languages={languages}
-            />
+              {activeTab === 'languages' && (
+                <LanguagesTab
+                  languages={languages}
+                />
+              )}
+
+              {activeTab === 'admins' && (
+                <AdminsTab
+                  subAdmins={subAdmins}
+                  onCreateSubAdmin={handleCreateSubAdmin}
+                  onUpdateSubAdmin={handleUpdateSubAdmin}
+                  onDeleteSubAdmin={handleDeleteSubAdmin}
+                />
+              )}
+            </>
           )}
         </main>
       </div>
@@ -294,6 +391,13 @@ export default function App() {
         <AddPlanModal
           onClose={() => setShowAddPlanModal(false)}
           onSave={handleAddPlan}
+        />
+      )}
+
+      {showLoginModal && (
+        <LoginModal
+          onLogin={handleLogin}
+          onClose={() => setShowLoginModal(false)}
         />
       )}
     </div>
