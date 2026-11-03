@@ -40,9 +40,9 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-indigo-600" />
             Subscription Tiers & Monetization Matrix
           </h2>
@@ -73,8 +73,8 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
               key={planId}
               className={`relative rounded-3xl p-6 border flex flex-col justify-between transition-all duration-300 hover:shadow-xl ${
                 isPopular
-                  ? 'bg-gradient-to-b from-indigo-50/50 via-white to-white border-indigo-400 shadow-md shadow-indigo-500/10'
-                  : 'bg-white border-slate-200/90 shadow-sm'
+                  ? 'bg-gradient-to-b from-indigo-950/40 via-[#111827] to-[#111827] border-indigo-500/60 shadow-md shadow-indigo-500/10'
+                  : 'bg-[#111827] border-slate-800 shadow-sm'
               }`}
             >
               {isPopular && (
@@ -87,8 +87,8 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
                 {/* Plan Header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">{plan.name || tier}</h3>
-                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 mt-1 inline-block font-bold">
+                    <h3 className="text-lg font-extrabold text-white tracking-tight">{plan.name || tier}</h3>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-1 inline-block font-bold">
                       {tier}
                     </span>
                   </div>
@@ -106,9 +106,9 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
                 </div>
 
                 {/* Price Display */}
-                <div className="mt-5 pb-5 border-b border-slate-100">
+                <div className="mt-5 pb-5 border-b border-slate-800">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-slate-900">
+                    <span className="text-3xl font-extrabold text-white">
                       ₹{price}
                     </span>
                     <span className="text-xs text-slate-500 font-medium">/{plan.interval || 'month'}</span>
@@ -117,20 +117,20 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
                 </div>
 
                 {/* Core Metrics */}
-                <div className="py-4 space-y-2.5 text-xs border-b border-slate-100">
-                  <div className="flex items-center justify-between text-slate-600">
+                <div className="py-4 space-y-2.5 text-xs border-b border-slate-800">
+                  <div className="flex items-center justify-between text-slate-400">
                     <span className="flex items-center gap-2 text-slate-500">
                       <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
                       Storage Allocation:
                     </span>
-                    <span className="font-extrabold text-slate-900">{plan.storageLimitGB || 5} GB</span>
+                    <span className="font-extrabold text-white">{plan.storageLimitGB || 5} GB</span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-600">
+                  <div className="flex items-center justify-between text-slate-400">
                     <span className="flex items-center gap-2 text-slate-500">
                       <Users className="w-3.5 h-3.5 text-violet-600" />
                       Devices / Family:
                     </span>
-                    <span className="font-extrabold text-slate-900">{plan.peopleLimit || 1}</span>
+                    <span className="font-extrabold text-white">{plan.peopleLimit || 1}</span>
                   </div>
                 </div>
 
@@ -139,7 +139,7 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
                   <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Features Included</div>
                   <ul className="space-y-1.5">
                     {features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                      <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
                         <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
@@ -149,8 +149,8 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
               </div>
 
               {/* Status Badge */}
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs px-2.5 py-1 rounded-full font-bold border bg-emerald-50 text-emerald-700 border-emerald-200">
+              <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+                <span className="text-xs px-2.5 py-1 rounded-full font-bold border bg-emerald-950/70 text-emerald-400 border-emerald-800/70">
                   Active in Live Database
                 </span>
               </div>

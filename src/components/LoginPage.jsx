@@ -28,34 +28,34 @@ export default function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-4 sm:p-6 font-sans relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#0B0F19] p-4 sm:p-6 font-sans relative overflow-hidden">
       {/* Subtle ambient lighting */}
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative w-full max-w-md">
         {/* Card */}
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-8 sm:p-10">
+        <div className="bg-[#111827]/95 backdrop-blur-2xl rounded-3xl border border-slate-800 shadow-2xl p-8 sm:p-10">
           {/* Logo & Header */}
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/25 mb-4 ring-4 ring-indigo-50">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/25 mb-4 ring-1 ring-white/10">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-[11px] font-bold text-indigo-700 tracking-wider uppercase mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[11px] font-bold text-indigo-400 tracking-wider uppercase mb-2">
               BMM Vault Management
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Admin Portal
             </h1>
-            <p className="text-xs text-slate-500 mt-1.5 max-w-xs">
+            <p className="text-xs text-slate-400 mt-1.5 max-w-xs">
               Enter your authorized administrative credentials to access the console.
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="mb-6 p-3.5 rounded-2xl bg-rose-950/70 border border-rose-800/80 text-rose-300 text-xs font-semibold flex items-center gap-2.5 animate-shake">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
               <span className="leading-relaxed">{error}</span>
             </div>
           )}
@@ -63,11 +63,11 @@ export default function LoginPage({ onLoginSuccess }) {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-2">
+              <label className="block text-xs font-bold text-slate-300 mb-2">
                 Login ID
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -81,17 +81,17 @@ export default function LoginPage({ onLoginSuccess }) {
                     setLoginId(e.target.value);
                     if (error) setError("");
                   }}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-950/90 border border-slate-800 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:bg-slate-950 focus:ring-2 focus:ring-indigo-500/20 transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-2">
+              <label className="block text-xs font-bold text-slate-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
@@ -104,12 +104,12 @@ export default function LoginPage({ onLoginSuccess }) {
                     setPassword(e.target.value);
                     if (error) setError("");
                   }}
-                  className="w-full pl-10 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition font-mono"
+                  className="w-full pl-10 pr-11 py-3 bg-slate-950/90 border border-slate-800 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:bg-slate-950 focus:ring-2 focus:ring-indigo-500/20 transition font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 focus:outline-none"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -120,7 +120,7 @@ export default function LoginPage({ onLoginSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm shadow-xl shadow-indigo-500/25 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99] text-white font-bold text-xs sm:text-sm shadow-xl shadow-indigo-500/25 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -137,8 +137,8 @@ export default function LoginPage({ onLoginSuccess }) {
           </form>
 
           {/* Footer note */}
-          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-            <p className="text-[11px] text-slate-400">
+          <div className="mt-8 pt-6 border-t border-slate-800 text-center">
+            <p className="text-[11px] text-slate-500">
               Protected by 256-bit AES encryption & RBAC security policy.
             </p>
           </div>

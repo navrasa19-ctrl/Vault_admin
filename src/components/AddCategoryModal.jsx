@@ -27,10 +27,10 @@ export default function AddCategoryModal({ onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-md rounded-3xl bg-white border border-slate-200 p-6 shadow-2xl">
+      <div className="relative w-full max-w-md rounded-3xl bg-[#111827] border border-slate-800 p-6 shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition"
+          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
         >
           <X className="w-5 h-5" />
         </button>
@@ -40,26 +40,26 @@ export default function AddCategoryModal({ onClose, onSave }) {
             <FolderPlus className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Create New Category</h3>
+            <h3 className="text-lg font-bold text-white">Create New Category</h3>
             <p className="text-xs text-slate-500">Add a new document taxonomy node and classifications</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Category Name</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Category Name</label>
             <input
               type="text"
               required
               placeholder="e.g. Legal & Contracts"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Accent Color</label>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Accent Color</label>
             <div className="flex items-center gap-2">
               {colors.map(c => (
                 <button
@@ -74,7 +74,7 @@ export default function AddCategoryModal({ onClose, onSave }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
               Initial Subcategories (comma separated)
             </label>
             <textarea
@@ -82,7 +82,7 @@ export default function AddCategoryModal({ onClose, onSave }) {
               placeholder="Agreements, Court Deeds, Affidavits, Power of Attorney"
               value={subcategoriesStr}
               onChange={(e) => setSubcategoriesStr(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -90,7 +90,7 @@ export default function AddCategoryModal({ onClose, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold hover:bg-slate-200 transition"
+              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-400 text-xs font-semibold hover:bg-slate-200 transition"
             >
               Cancel
             </button>

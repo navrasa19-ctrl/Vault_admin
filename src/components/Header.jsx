@@ -24,7 +24,7 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
       case "overview": return "Command & Telemetry Overview";
       case "users": return "Subscriber Roster & Storage Usage";
       case "geo": return "India State Demographics & Locations";
-      case "categories": return "Category Taxonomy & Document Classification";
+      case "categories": return "Category Taxonomy & Classification";
       case "plans": return "Monetization Tiers & Storage Quotas";
       case "storage": return "Cloud Storage Health & Vault Quota";
       case "shares": return "Shared Links Telemetry & Revocation";
@@ -36,15 +36,15 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
   };
 
   return (
-    <header className="h-18 px-8 bg-white/80 border-b border-slate-200/80 backdrop-blur-xl flex items-center justify-between shrink-0 sticky top-0 z-20">
+    <header className="h-18 px-8 bg-[#0D1322]/90 border-b border-slate-800/80 backdrop-blur-xl flex items-center justify-between shrink-0 sticky top-0 z-20">
       {/* Title & Breadcrumbs */}
       <div>
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
           <span>BMM Vault Console</span>
           <span>/</span>
-          <span className="text-indigo-600 capitalize font-bold">{activeTab}</span>
+          <span className="text-indigo-400 capitalize font-bold">{activeTab}</span>
         </div>
-        <h1 className="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+        <h1 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
           {getTabTitle()}
         </h1>
       </div>
@@ -57,9 +57,9 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
           placeholder="Global vault search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-12 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition"
+          className="w-full pl-9 pr-12 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 transition"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-200/60 border border-slate-300/60">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700">
           ⌘K
         </span>
       </div>
@@ -69,14 +69,14 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
         {/* Refresh Button */}
         <button
           onClick={handleRefresh}
-          className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 shadow-sm transition active:scale-95"
+          className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white shadow-sm transition active:scale-95"
           title="Sync with Live Database"
         >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-600" : ""}`} />
+          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-400" : ""}`} />
         </button>
 
         {/* Live System Indicator */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-semibold">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/70 text-emerald-400 text-xs font-semibold">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -85,7 +85,7 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
         </div>
 
         {/* Admin Session Badge & Logout */}
-        <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
+        <div className="flex items-center gap-3 pl-3 border-l border-slate-800">
           <div className="flex items-center gap-2.5">
             <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md ${
               isSuper
@@ -96,13 +96,13 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
             </div>
             <div className="hidden md:block text-left">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-900 leading-none">
+                <span className="text-xs font-bold text-white leading-none">
                   {user?.name || "Admin"}
                 </span>
                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase ${
                   isSuper
-                    ? "bg-amber-100 text-amber-800 border border-amber-200"
-                    : "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                    : "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
                 }`}>
                   {isSuper ? "Super Admin" : "Sub-Admin"}
                 </span>
@@ -115,7 +115,7 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
 
           <button
             onClick={onLogout}
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition border border-transparent hover:border-rose-200"
+            className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition border border-transparent hover:border-rose-900/60"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />

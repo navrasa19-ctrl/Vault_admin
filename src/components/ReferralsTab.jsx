@@ -80,7 +80,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-white/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111827]/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-3">
               <Share2 className="w-3.5 h-3.5 text-amber-300" />
               <span>Organic App Growth & Invite Tracking</span>
             </div>
@@ -94,7 +94,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition shadow-sm shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#111827]/10 hover:bg-[#111827]/20 border border-white/20 text-white text-xs font-bold transition shadow-sm shrink-0"
           >
             <Download className="w-4 h-4 text-white" />
             <span>Export Referral Roster CSV</span>
@@ -104,7 +104,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
 
       {/* 4 Metric KPI Cards (Clean Download Counts - No Unconfirmed Rewards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">App Downloads via Share</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
@@ -115,25 +115,25 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
           <p className="text-xs text-slate-400 mt-1 font-medium">Verified app registrations through links</p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Promoters</span>
             <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900">{activeSharers}</div>
+          <div className="text-3xl font-extrabold text-white">{activeSharers}</div>
           <p className="text-xs text-slate-400 mt-1 font-medium">Users who brought &ge; 1 successful download</p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Top Promoter Champion</span>
             <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl font-extrabold text-slate-900 truncate">
+          <div className="text-xl font-extrabold text-white truncate">
             {topPromoter ? (topPromoter.name || topPromoter.phone || 'Dev Varshney') : 'None Yet'}
           </div>
           <p className="text-xs text-amber-600 mt-1 font-semibold">
@@ -141,14 +141,14 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Reward Policy</span>
-            <div className="p-1.5 rounded-lg bg-slate-100 text-slate-600">
+            <div className="p-1.5 rounded-lg bg-slate-800 text-slate-400">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-sm font-extrabold text-slate-800">Count-Only Mode</div>
+          <div className="text-sm font-extrabold text-slate-200">Count-Only Mode</div>
           <p className="text-xs text-slate-400 mt-1 font-medium">Rewards will be configured as per client policy</p>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
             placeholder="Search by user name, phone, email, or referral code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-sm"
+            className="w-full pl-10 pr-4 py-2 bg-[#111827] border border-slate-800 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-sm"
           />
         </div>
         <span className="text-xs font-semibold text-slate-500 font-mono">
@@ -171,10 +171,10 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
       </div>
 
       {/* Main Table: User-Wise Share Codes & Downloads Generated */}
-      <div className="rounded-3xl bg-white border border-slate-200/90 overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="rounded-3xl bg-[#111827] border border-slate-800 overflow-hidden shadow-sm">
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80/50">
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
               <Users className="w-4 h-4 text-indigo-600" />
               User Share Codes & Downloads Ledger
             </h3>
@@ -187,7 +187,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider">
+              <tr className="border-b border-slate-800 bg-slate-900/80/80 text-slate-500 font-bold uppercase tracking-wider">
                 <th className="py-3.5 px-5">User (Promoter)</th>
                 <th className="py-3.5 px-4">Unique Invite Code</th>
                 <th className="py-3.5 px-4">Shareable App Link</th>
@@ -205,7 +205,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
                   const link = `https://beememvault.com/join?ref=${code}`;
 
                   return (
-                    <tr key={uid} className="hover:bg-slate-50/80 transition">
+                    <tr key={uid} className="hover:bg-slate-900/80/80 transition">
                       {/* User */}
                       <td className="py-3.5 px-5">
                         <div className="flex items-center gap-3">
@@ -213,7 +213,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
                             {(u.name || u.phone || u.email || 'U').charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-bold text-slate-900">{u.name || 'Registered User'}</div>
+                            <div className="font-bold text-white">{u.name || 'Registered User'}</div>
                             <div className="text-[11px] text-slate-400 font-mono mt-0.5">
                               {u.phone || u.email || 'No contact'}
                             </div>
@@ -260,7 +260,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
                           <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold font-mono border ${
                             count > 0
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-slate-50 text-slate-500 border-slate-200'
+                              : 'bg-slate-900/80 text-slate-500 border-slate-800'
                           }`}>
                             {count} {count === 1 ? 'Download' : 'Downloads'}
                           </span>
@@ -275,7 +275,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
                       {/* Referred By */}
                       <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500">
                         {u.referredBy ? (
-                          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold border border-slate-200">
+                          <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold border border-slate-800">
                             {u.referredBy}
                           </span>
                         ) : (
@@ -304,10 +304,10 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
 
       {/* Live Verified App Installs Log (Recent Conversions) */}
       {activityList.length > 0 && (
-        <div className="rounded-3xl bg-white border border-slate-200/90 overflow-hidden shadow-sm">
-          <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <div className="rounded-3xl bg-[#111827] border border-slate-800 overflow-hidden shadow-sm">
+          <div className="p-5 border-b border-slate-800 bg-slate-900/80/50 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 Live Verified App Installs Log
               </h3>
@@ -323,7 +323,7 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider">
+                <tr className="border-b border-slate-800 bg-slate-900/80/80 text-slate-500 font-bold uppercase tracking-wider">
                   <th className="py-3.5 px-5">Referrer (Who Shared)</th>
                   <th className="py-3.5 px-4">Invite Code</th>
                   <th className="py-3.5 px-4">New User Installed</th>
@@ -333,14 +333,14 @@ export default function ReferralsTab({ referrals = {}, users = [] }) {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {activityList.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/80 transition">
-                    <td className="py-3.5 px-5 font-semibold text-slate-900">
+                  <tr key={idx} className="hover:bg-slate-900/80/80 transition">
+                    <td className="py-3.5 px-5 font-semibold text-white">
                       {r.referrerName || r.referrerEmail || 'Promoter User'}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-indigo-600 font-bold">
                       {r.code || 'VAULT'}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-medium">
+                    <td className="py-3.5 px-4 text-slate-300 font-medium">
                       {r.referredName || r.referredEmail || 'New App User'}
                     </td>
                     <td className="py-3.5 px-4 text-slate-500 text-[11px] font-mono">

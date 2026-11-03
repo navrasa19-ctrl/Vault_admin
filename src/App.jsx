@@ -262,7 +262,7 @@ export default function App() {
   const hasAccess = isSuper || (activeTab === "admins" ? isSuper : userPerms.includes(activeTab));
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] text-slate-900 overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#0B0F19] text-slate-100 overflow-hidden font-sans">
       {toast && (
         <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-2xl border shadow-xl text-xs font-bold flex items-center gap-2 animate-slideDown ${
           toast.type === "error"

@@ -50,9 +50,9 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-white border border-slate-200/90 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#111827] border border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600" />
             Taxonomy & Category Architecture
           </h2>
@@ -68,7 +68,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
               placeholder="Search taxonomy..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+              className="w-full pl-9 pr-4 py-2 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
             />
           </div>
           <button
@@ -91,7 +91,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
           return (
             <div
               key={catId}
-              className="p-6 rounded-3xl bg-white border border-slate-200/90 hover:border-indigo-300 shadow-sm hover:shadow-lg transition flex flex-col justify-between"
+              className="p-6 rounded-3xl bg-[#111827] border border-slate-800 hover:border-indigo-500/50 shadow-sm hover:shadow-lg transition flex flex-col justify-between"
             >
               <div>
                 {/* Header */}
@@ -103,7 +103,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                       <Layers className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 text-base tracking-tight flex items-center gap-2">
+                      <h3 className="font-bold text-white text-base tracking-tight flex items-center gap-2">
                         {catName}
                         {cat.isHomeTile && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -127,10 +127,10 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                 </div>
 
                 {/* Document count pill */}
-                <div className="mt-4 flex items-center gap-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                <div className="mt-4 flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
                   <FileText className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Enrolled Documents:</span>
-                  <span className="font-bold text-slate-900 ml-auto">{cat.documentCount || cat.docCount || 0}</span>
+                  <span className="font-bold text-white ml-auto">{cat.documentCount || cat.docCount || 0}</span>
                 </div>
 
                 {/* Subcategories list */}
@@ -146,7 +146,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                         return (
                           <span
                             key={sId || idx}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-slate-100 text-slate-700 border border-slate-200 group/tag hover:border-slate-300 transition"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs bg-slate-800 text-slate-300 border border-slate-800 group/tag hover:border-slate-300 transition"
                           >
                             <span>{sName}</span>
                             <button
@@ -167,7 +167,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
               </div>
 
               {/* Add Subcategory input */}
-              <div className="mt-6 pt-4 border-t border-slate-100">
+              <div className="mt-6 pt-4 border-t border-slate-800">
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
@@ -177,7 +177,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleAddSub(cat.id || cat._id);
                     }}
-                    className="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+                    className="flex-1 px-3 py-1.5 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
                   />
                   <button
                     onClick={() => handleAddSub(cat.id || cat._id)}
