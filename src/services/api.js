@@ -296,12 +296,29 @@ export const api = {
 
   async createPlan(payload) {
     try {
+      const cleanPayload = { ...payload };
+      const planId = String(cleanPayload.planId || cleanPayload.tier || cleanPayload.name || "").trim().toUpperCase().replace(/[^A-Z0-9_]/g, "_");
+      cleanPayload.planId = planId;
+      cleanPayload.tier = planId;
+      cleanPayload.badge = cleanPayload.badge || planId;
+
+      const price = Number(cleanPayload.price !== undefined ? cleanPayload.price : (cleanPayload.pricing?.monthly || 0));
+      cleanPayload.pricing = cleanPayload.pricing || {
+        monthly: price,
+        quarterly: price * 3,
+        semiAnnual: price * 6,
+        yearly: price * 10
+      };
+
       const res = await fetch(`${BASE_URL}/admin/plans`, {
         method: "POST",
         headers: getAuthHeader(),
-        body: JSON.stringify(payload)
+        body: JSON.stringify(cleanPayload)
       });
-      if (!res.ok) throw new Error(`Create plan error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Create plan error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("createPlan failed:", err);
@@ -315,7 +332,10 @@ export const api = {
         method: "DELETE",
         headers: getAuthHeader()
       });
-      if (!res.ok) throw new Error(`Delete plan error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Delete plan error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("deletePlan failed:", err);
