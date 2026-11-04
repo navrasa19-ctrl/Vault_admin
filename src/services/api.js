@@ -395,5 +395,34 @@ export const api = {
       console.error("getLanguages failed:", err);
       return [];
     }
+  },
+
+  async getLanguageDetails(code) {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/languages/${code}`, { headers: getAuthHeader() });
+      if (!res.ok) throw new Error(`Language details error: ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.error("getLanguageDetails failed:", err);
+      return null;
+    }
+  },
+
+  async updateLanguageTranslations(code, payload) {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/languages/${code}`, {
+        method: "PUT",
+        headers: getAuthHeader(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Update language error: ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("updateLanguageTranslations failed:", err);
+      throw err;
+    }
   }
 };
