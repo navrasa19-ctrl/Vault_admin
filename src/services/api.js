@@ -200,12 +200,23 @@ export const api = {
 
   async createCategory(payload) {
     try {
+      const cleanPayload = { ...payload };
+      if (typeof cleanPayload.name === "string") {
+        const n = cleanPayload.name.trim();
+        cleanPayload.name = { en: n, hi: "" };
+        if (!cleanPayload.id) {
+          cleanPayload.id = n.toLowerCase().replace(/[^a-z0-9_]/g, "_").replace(/^_+|_+$/g, "");
+        }
+      }
       const res = await fetch(`${BASE_URL}/admin/categories`, {
         method: "POST",
         headers: getAuthHeader(),
-        body: JSON.stringify(payload)
+        body: JSON.stringify(cleanPayload)
       });
-      if (!res.ok) throw new Error(`Create category error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Create category error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("createCategory failed:", err);
@@ -219,7 +230,10 @@ export const api = {
         method: "DELETE",
         headers: getAuthHeader()
       });
-      if (!res.ok) throw new Error(`Delete category error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Delete category error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("deleteCategory failed:", err);
@@ -229,12 +243,21 @@ export const api = {
 
   async addSubcategory(categoryId, subName) {
     try {
+      const sName = typeof subName === "string" ? subName.trim() : (subName?.name || "");
+      const sId = sName.toLowerCase().replace(/[^a-z0-9_]/g, "_").replace(/^_+|_+$/g, "") || `sub_${Date.now()}`;
       const res = await fetch(`${BASE_URL}/admin/categories/${categoryId}/subcategories`, {
         method: "POST",
         headers: getAuthHeader(),
-        body: JSON.stringify({ name: subName })
+        body: JSON.stringify({
+          id: sId,
+          name: { en: sName, hi: "" },
+          supportsExpiry: false
+        })
       });
-      if (!res.ok) throw new Error(`Add subcategory error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Add subcategory error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("addSubcategory failed:", err);
@@ -248,7 +271,10 @@ export const api = {
         method: "DELETE",
         headers: getAuthHeader()
       });
-      if (!res.ok) throw new Error(`Delete subcategory error: ${res.status}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Delete subcategory error: ${res.status}`);
+      }
       return await res.json();
     } catch (err) {
       console.error("deleteSubcategory failed:", err);
