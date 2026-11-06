@@ -22,6 +22,7 @@ export default function Header({ activeTab, searchQuery, setSearchQuery, user, o
   const getTabTitle = () => {
     switch (activeTab) {
       case "overview": return "Command & Telemetry Overview";
+      case "revenue": return "Revenue & Subscription Ledger";
       case "users": return "Subscriber Roster & Storage Usage";
       case "geo": return "India State Demographics & Locations";
       case "categories": return "Category Taxonomy & Classification";

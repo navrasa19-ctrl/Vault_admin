@@ -2,6 +2,7 @@ import React from "react";
 import {
   Shield,
   LayoutDashboard,
+  IndianRupee,
   Users,
   FolderTree,
   CreditCard,
@@ -22,6 +23,7 @@ export default function Sidebar({ activeTab, setActiveTab, stats, currentUser })
 
   const allMenuItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard, badge: "Live" },
+    { id: "revenue", label: "Revenue & Ledger", icon: IndianRupee, badge: "₹ INR" },
     { id: "users", label: "Users & Plans", icon: Users, count: stats?.totalUsers || 5 },
     { id: "geo", label: "State Demographics", icon: MapPin, badge: "India" },
     { id: "categories", label: "Categories & Taxonomy", icon: FolderTree },

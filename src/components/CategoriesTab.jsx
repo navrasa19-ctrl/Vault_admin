@@ -6,10 +6,11 @@ import {
   X,
   FileText,
   Layers,
-  Search
+  Search,
+  Pencil
 } from 'lucide-react';
 
-export default function CategoriesTab({ categories = [], onAddCategory, onDeleteCategory, onAddSubcategory, onDeleteSubcategory }) {
+export default function CategoriesTab({ categories = [], onAddCategory, onEditCategory, onDeleteCategory, onAddSubcategory, onDeleteSubcategory }) {
   const [search, setSearch] = useState('');
   const [newSubInput, setNewSubInput] = useState({});
 
@@ -98,7 +99,8 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div 
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 shadow-sm"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white shadow-md shrink-0"
+                      style={{ backgroundColor: cat.colour || cat.color || '#4F46E5' }}
                     >
                       <Layers className="w-6 h-6" />
                     </div>
@@ -106,7 +108,7 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                       <h3 className="font-bold text-white text-base tracking-tight flex items-center gap-2">
                         {catName}
                         {cat.isHomeTile && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-800">
                             Home Tile
                           </span>
                         )}
@@ -117,13 +119,22 @@ export default function CategoriesTab({ categories = [], onAddCategory, onDelete
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => onDeleteCategory && onDeleteCategory(cat.id || cat._id, catName)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
-                    title="Delete category"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onEditCategory && onEditCategory(cat)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition"
+                      title="Update category"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => onDeleteCategory && onDeleteCategory(cat.id || cat._id, catName)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/50 transition"
+                      title="Delete category"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Document count pill */}

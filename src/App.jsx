@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import OverviewTab from "./components/OverviewTab";
+import RevenueTab from "./components/RevenueTab";
 import UsersTab from "./components/UsersTab";
 import StateDemographicsTab from "./components/StateDemographicsTab";
 import CategoriesTab from "./components/CategoriesTab";
@@ -14,7 +15,9 @@ import AdminsTab from "./components/AdminsTab";
 import AccessRestrictedTab from "./components/AccessRestrictedTab";
 import PlanAllotmentModal from "./components/PlanAllotmentModal";
 import AddCategoryModal from "./components/AddCategoryModal";
+import EditCategoryModal from "./components/EditCategoryModal";
 import AddPlanModal from "./components/AddPlanModal";
+import EditPlanModal from "./components/EditPlanModal";
 import LoginPage from "./components/LoginPage";
 import { api } from "./services/api";
 
@@ -26,6 +29,7 @@ export default function App() {
   // Core Data State from Real MongoDB
   const [stats, setStats] = useState(null);
   const [analytics, setAnalytics] = useState(null);
+  const [revenueData, setRevenueData] = useState(null);
   const [users, setUsers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [plans, setPlans] = useState([]);
@@ -38,7 +42,9 @@ export default function App() {
   // Modals
   const [allotmentUser, setAllotmentUser] = useState(null);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [showAddPlanModal, setShowAddPlanModal] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(null);
 
   // Toast
   const [toast, setToast] = useState(null);
@@ -61,6 +67,7 @@ export default function App() {
         sharesData,
         refsData,
         langsData,
+        revData,
         subAdminsData
       ] = await Promise.all([
         api.getStats(),
@@ -71,6 +78,7 @@ export default function App() {
         api.getShares(),
         api.getReferrals(),
         api.getLanguages(),
+        api.getRevenue(),
         currentUser.role === "super_admin" ? api.getSubAdmins() : Promise.resolve([])
       ]);
 
@@ -82,6 +90,7 @@ export default function App() {
       setShares(sharesData);
       setReferrals(refsData);
       setLanguages(langsData);
+      setRevenueData(revData);
       setSubAdmins(subAdminsData || []);
     } catch (err) {
       console.error("Dashboard data load failed:", err);
@@ -140,6 +149,17 @@ export default function App() {
     }
   };
 
+  const handleUpdateCategory = async (catId, categoryData) => {
+    try {
+      await api.updateCategory(catId, categoryData);
+      setEditingCategory(null);
+      showToast("Category updated in live database");
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message || "Failed to update category", "error");
+    }
+  };
+
   const handleDeleteCategory = async (catId) => {
     if (!window.confirm("Delete this category? Documents inside will remain safe.")) return;
     try {
@@ -179,6 +199,17 @@ export default function App() {
       loadDashboardData();
     } catch (err) {
       showToast("Failed to create plan", "error");
+    }
+  };
+
+  const handleUpdatePlan = async (planId, planData) => {
+    try {
+      await api.updatePlan(planId, planData);
+      setEditingPlan(null);
+      showToast("Plan updated in live database");
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message || "Failed to update plan", "error");
     }
   };
 
@@ -312,6 +343,13 @@ export default function App() {
                 />
               )}
 
+              {activeTab === "revenue" && (
+                <RevenueTab
+                  revenueData={revenueData}
+                  onRefresh={loadDashboardData}
+                />
+              )}
+
               {activeTab === "users" && (
                 <UsersTab
                   users={users}
@@ -332,6 +370,7 @@ export default function App() {
                 <CategoriesTab
                   categories={categories}
                   onAddCategory={() => setShowAddCategoryModal(true)}
+                  onEditCategory={(cat) => setEditingCategory(cat)}
                   onDeleteCategory={handleDeleteCategory}
                   onAddSubcategory={handleAddSubcategory}
                   onDeleteSubcategory={handleDeleteSubcategory}
@@ -342,6 +381,7 @@ export default function App() {
                 <PlansTab
                   plans={plans}
                   onAddPlan={() => setShowAddPlanModal(true)}
+                  onEditPlan={(p) => setEditingPlan(p)}
                   onDeletePlan={handleDeletePlan}
                 />
               )}
@@ -403,10 +443,26 @@ export default function App() {
         />
       )}
 
+      {editingCategory && (
+        <EditCategoryModal
+          category={editingCategory}
+          onClose={() => setEditingCategory(null)}
+          onSave={handleUpdateCategory}
+        />
+      )}
+
       {showAddPlanModal && (
         <AddPlanModal
           onClose={() => setShowAddPlanModal(false)}
           onSave={handleAddPlan}
+        />
+      )}
+
+      {editingPlan && (
+        <EditPlanModal
+          plan={editingPlan}
+          onClose={() => setEditingPlan(null)}
+          onSave={handleUpdatePlan}
         />
       )}
     </div>

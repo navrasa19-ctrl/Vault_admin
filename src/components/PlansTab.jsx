@@ -6,10 +6,11 @@ import {
   HardDrive,
   Users,
   Trash2,
-  Sparkles
+  Sparkles,
+  Pencil
 } from 'lucide-react';
 
-export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
+export default function PlansTab({ plans = [], onAddPlan, onEditPlan, onDeletePlan }) {
   const planList = Array.isArray(plans) ? plans : plans?.plans || [];
 
   const getPrice = (plan) => {
@@ -23,18 +24,24 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
   };
 
   const getFeaturesList = (plan) => {
-    if (Array.isArray(plan.features)) return plan.features;
+    const list = [];
     if (plan.features && typeof plan.features === 'object') {
-      const list = [];
       if (plan.features.aiOcr) list.push('AI OCR Instant Document Extraction');
+      if (plan.features.bulkOcr) list.push('Bulk OCR Processing');
       if (plan.features.secureShareLinks) list.push('Password Protected Secure Share Links');
       if (plan.features.expiryReminders) list.push('Automated Expiry Push Reminders');
       if (plan.features.biometricLock) list.push('Biometric FaceID / Fingerprint Lock');
       if (plan.features.bulkUploadLimit) list.push(`Bulk Upload Up to ${plan.features.bulkUploadLimit} Files`);
-      list.push('10 Official Indian Languages');
-      return list;
     }
-    return ['AES-256 Military Vault Encryption', '10 Indian Languages', 'Secure Cloud Backup'];
+    if (Array.isArray(plan.customFeatures)) {
+      plan.customFeatures.forEach((cf) => {
+        if (cf && !list.includes(cf)) list.push(cf);
+      });
+    }
+    if (list.length === 0) {
+      list.push('AES-256 Military Vault Encryption', '10 Indian Languages', 'Secure Cloud Backup');
+    }
+    return list;
   };
 
   return (
@@ -93,10 +100,17 @@ export default function PlansTab({ plans = [], onAddPlan, onDeletePlan }) {
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onEditPlan && onEditPlan(plan)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition"
+                      title="Update plan"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
                     {!['FREE', 'PREMIUM'].includes(tier) && (
                       <button
                         onClick={() => onDeletePlan && onDeletePlan(plan.planId || tier, plan.name)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/50 transition"
                         title="Delete plan"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

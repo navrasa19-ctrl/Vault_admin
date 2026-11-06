@@ -3,6 +3,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "https://bmm-vault-backend.onre
 
 export const ALL_PERMISSIONS = [
   "overview",
+  "revenue",
   "users",
   "geo",
   "categories",
@@ -135,6 +136,32 @@ export const api = {
     }
   },
 
+  // Revenue Intelligence & Plan Ledger
+  async getRevenue() {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/revenue`, { headers: getAuthHeader() });
+      if (!res.ok) throw new Error(`Revenue error: ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.error("getRevenue failed:", err);
+      return {
+        summary: { totalRevenue: 0, pendingRevenue: 0, grossRevenue: 0, totalTransactions: 0, activeSubscribers: 0, totalUsers: 0, currency: "INR" },
+        planWiseRevenue: []
+      };
+    }
+  },
+
+  async getPlanPurchasers(planId) {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/revenue/plans/${planId}/users`, { headers: getAuthHeader() });
+      if (!res.ok) throw new Error(`Plan purchasers error: ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.error("getPlanPurchasers failed:", err);
+      return { planId, count: 0, purchasers: [] };
+    }
+  },
+
   // Existing Portal Methods
   async getStats() {
     try {
@@ -220,6 +247,24 @@ export const api = {
       return await res.json();
     } catch (err) {
       console.error("createCategory failed:", err);
+      throw err;
+    }
+  },
+
+  async updateCategory(categoryId, payload) {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/categories/${categoryId}`, {
+        method: "PATCH",
+        headers: getAuthHeader(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Update category error: ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("updateCategory failed:", err);
       throw err;
     }
   },
@@ -322,6 +367,24 @@ export const api = {
       return await res.json();
     } catch (err) {
       console.error("createPlan failed:", err);
+      throw err;
+    }
+  },
+
+  async updatePlan(planId, payload) {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/plans/${planId}`, {
+        method: "PATCH",
+        headers: getAuthHeader(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Update plan error: ${res.status}`);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("updatePlan failed:", err);
       throw err;
     }
   },
